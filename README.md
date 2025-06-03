@@ -1,2 +1,2 @@
-# manufacturing-erp
-Manufacturing ERP with Inventory/Parts module
+# Manufacturing ERP
+A manufacturing ERP with a robust Inventory/Parts module, including parts management, BOMs, AI forecasting, voice commands, VR visualization, and reporting. Built with React, Node.js, PostgreSQL, and A-Frame.
