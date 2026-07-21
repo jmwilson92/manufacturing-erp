@@ -1,94 +1,102 @@
-# Business Central → Production integration
+# Business Central ↔ Flow integration
 
-## Principle: one system of record per concern
+## The dividing line
 
-| Concern | System of record | Why |
+Business Central keeps everything **up to and including release**. Flow owns everything
+**after release** — and posts the results back. Nothing is re-keyed at the boundary.
+
+```
+  BUSINESS CENTRAL  (system of record for demand + planning)
+  ─ Forecast ─ Sales orders ─ Production orders (from BOMs)
+                                   Planned → Firm Planned → Released
+                                                              │
+                                          RELEASED  ──────────┤  ← Flow picks up here
+                                                              │
+  FLOW  (system of record for execution)                     ▼
+  ─ Kitting (the production BOM) ─ Routing execution ─ Sign-offs ─ Labor time ─ Finished
+        │                 │                    │
+        ▼                 ▼                    ▼
+   Consumption       Output journal      Status → Finished     ← posted back to BC
+     journal        (qty + run time)
+```
+
+Production orders are built from a **production BOM** (components + routing) inside BC — never
+"by product" in Flow. Flow reads the released order, its BOM, and its routing; it does not create
+or plan them.
+
+## Why "Released" is the handoff
+
+In BC a production order can be **Simulated → Planned → Firm Planned → Released → Finished**.
+Released is the *only* status where the shop floor can register **consumption** and **output** and
+where flushing occurs. That is exactly Flow's job, so Released is the natural pickup point:
+
+- **Planned / Firm Planned** — planner's territory, dates still moving. Flow shows them read-only.
+- **Released** — BC hands off. Flow kits, runs, signs off, and posts back.
+- **Finished** — Flow closes it and flips the BC status.
+
+## What Flow pulls from BC
+
+Base URL: `https://api.businesscentral.dynamics.com/v2.0/{tenantId}/{environment}/api/v2.0/companies({companyId})/`
+
+| Data | Source | Notes |
 |---|---|---|
-| **Demand** — sales orders, forecasts, customers, items | **Business Central** | Sales/finance already live here; don't fork the truth. |
-| **Supply / execution** — production orders, routing, picks, floor progress, capacity | **This app** | BC's production module is the part we're replacing. |
+| Released production orders | **Custom API page** over `Production Order` (5405), filtered `Status = Released` | Header: no., item, quantity, due date, source sales order. |
+| Production BOM lines (the kit) | **Custom API page** over `Prod. Order Component` (5407) | Item, quantity-per, expected qty, bin. Becomes the kitting list. |
+| Routing operations | **Custom API page** over `Prod. Order Routing Line` (5409) | Operation no., work/machine center, setup + run time. Becomes the traveler. |
+| Sales orders (demand context) | Standard `salesOrders` + `salesOrderLines` | For the demand view + linking an order back to its customer. |
+| Demand forecast | **Custom API page** over `Production Forecast Entry` | Not in the standard API. Sales Item / Component / Both. |
+| Items / inventory | Standard `items` | On-hand for the demand view's net-requirement display. |
 
-Demand flows **in** from BC and drives planning. Finished-good completions and (optionally)
-material consumption flow **back** to BC to keep inventory honest. We never ask a planner to
-re-key a sales order.
+> The manufacturing tables (5405/5407/5409) are **not** in the standard API — they require custom API
+> pages (an AL extension exposing read pages under an `APIGroup`). Sales orders, items, and customers
+> are standard v2.0.
 
-## What we pull from BC, and from where
+## What Flow posts back to BC
 
-All endpoints are the standard **API v2.0** unless noted. Base URL:
+This is core to the design, not a later phase — the whole point is that manipulating the order in
+Flow keeps BC correct.
 
-```
-https://api.businesscentral.dynamics.com/v2.0/{tenantId}/{environment}/api/v2.0/companies({companyId})/
-```
-
-| Data | Endpoint | Notes |
-|---|---|---|
-| Sales orders | `GET /salesOrders?$expand=salesOrderLines` | Open demand. Header + lines in one call. |
-| Sales order lines | `salesOrderLines` (expanded above) | `lineObjectNumber` = item no., `quantity`, `shippedQuantity`, header `requestedDeliveryDate`. |
-| Items | `GET /items` | Item master, base UoM, item category. |
-| Item inventory | `GET /items({id})?$expand=...` / itemLedger | On-hand for net-requirement calc. |
-| Customers | `GET /customers` | Names shown on demand feed. |
-| **Demand forecast** | **Custom API page** over `Production Forecast Entry` (table 99000852) | Not in the standard API. Publish a read API page (`APIGroup=planning`), or use the Sales & Inventory Forecast / ML Forecasting extension for predicted demand. Forecast type = `Sales Item` / `Component` / `Both`. |
-
-### Field mapping (sales order line → planning)
-
-| BC property | Used as |
+| Flow action | Posted to BC |
 |---|---|
-| `salesOrder.number` | Demand source reference (shown on planned PO) |
-| `salesOrder.customerName` | Customer on demand feed |
-| `salesOrder.requestedDeliveryDate` | Need-by date → backward schedule |
-| `salesOrderLine.lineObjectNumber` | Item / part number |
-| `salesOrderLine.quantity − shippedQuantity` | Open demand quantity |
-| Forecast entry `quantity` / `forecastDate` | Forecast demand in the planning bucket |
+| **Kitting complete** — BOM issued to the floor | **Consumption journal** (item journal, entry type Consumption) against the prod. order components |
+| **Operation signed off** | **Output journal** — output quantity + **run time** for that routing line, tagged with the operator |
+| **Order finished** | Status change **Released → Finished** on the production order |
+| Scrap reported | Scrap quantity on the output posting |
 
-## Authentication
+Posting uses custom **unbound API actions** (AL codeunits exposed as APIs) that wrap
+`Prod. Order Journal` / item-journal posting, because the standard API doesn't post these journals.
+Each post is idempotent (keyed on Flow's operation + a client token) and retried with backoff; the
+UI's "Posted to Business Central" feed shows the running log.
 
-OAuth2 **client-credentials** via Microsoft Entra ID (Azure AD):
+## Sign-offs & labor time (Flow-native)
 
-1. Register an Entra app; grant the BC API app role `API.ReadWrite.All` (or read-only for pull-only).
-2. Token from `https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/token`, scope
-   `https://api.businesscentral.dynamics.com/.default`.
-3. All calls scoped to a **company** GUID within a tenant + environment.
+BC has no first-class "operator sign-off with labor by person" concept on the routing line — this is
+the gap Flow fills and the reason execution lives here:
 
-Store tenant/client id/secret as env vars (`fly secrets set` for the deployed app); never in the repo.
+- Each operation is **assigned to an operator**; a run timer captures actual labor minutes.
+- **Sign-off** stamps the operation with who completed it (QA operations stamp the inspector) and when.
+- Labor rolls up per operator per order and is what the **output journal** carries back as run time,
+  so BC's cost/capacity numbers reflect what actually happened on the floor.
 
-## Sync strategy
+## Auth & sync
 
-- **Near-real-time:** register API **webhooks/subscriptions** on `salesOrders` so BC pushes change
-  notifications → we fetch the delta. Best for "new sales order shows up on the board in seconds."
-- **Delta polling fallback:** `$filter=lastModifiedDateTime gt {lastSyncUtc}` on a 2–5 min timer.
-  Idempotent upsert keyed on BC `id`. Survives missed webhooks.
-- **Full reconcile:** nightly full pull to catch deletes/cancellations.
+- **OAuth2 client-credentials** via Microsoft Entra ID; token scope
+  `https://api.businesscentral.dynamics.com/.default`; all calls scoped to tenant → environment →
+  company. Secrets in env vars (`fly secrets set`), never in the repo.
+- **Inbound:** webhook/subscription on the production-order API page for near-real-time "released"
+  events, plus a `lastModifiedDateTime` delta poll (2–5 min) as a fallback, and a nightly full
+  reconcile for cancellations/reopens.
+- **Outbound:** post consumption/output/status as the operator acts; queue + retry so a BC hiccup
+  never blocks the floor.
 
-Persist a `bc_sync_state` row per entity (last cursor + timestamp). The UI's "Last sync" and
-"Sync now" surface this.
+## Prototype mapping
 
-## Planning bridge (the new bit)
+`production-orders/prototype.html` models this exactly:
 
-For each item, per planning bucket:
+- `FAMILIES[*].bom` / `.routing` stand in for `Prod. Order Component` / `Prod. Order Routing Line`.
+- Orders enter at **Firm Planned/Released** and Flow drives kitting → floor → finished.
+- Every kit/sign-off/finish calls `wbPost(...)`, the stand-in for the BC write-back actions; the
+  Command center and Floor "Posted to Business Central" panels render that log.
 
-```
-grossDemand   = Σ(open sales-order qty) + Σ(forecast qty)   // forecast consumed by actual SOs
-netRequirement = max(0, grossDemand − onHand − onOrder)     // onOrder = open production orders here
-```
-
-`netRequirement > 0` → suggested production order. Planner clicks **Plan PO**, which creates a
-routed production order pre-linked to the originating BC sales order(s)/forecast. From there the
-order runs the existing lifecycle (route → pick → sign-off → floor → close).
-
-> This mirrors BC's planning worksheet / MRP, but the output lands in *our* execution workflow
-> instead of BC production orders.
-
-## Write-back to BC (phase 2)
-
-| Event here | Write to BC |
-|---|---|
-| Production order completed | `itemJournal` output posting → increments finished-good inventory |
-| Material issued at pick | `itemJournal` consumption posting (optional; or keep components in BC) |
-| Order status change | Custom field / status API on the linked sales order for visibility |
-
-Write-back is opt-in per environment so a pilot can run **read-only** first.
-
-## Prototype ↔ real feed
-
-In `production-orders/prototype.html`, `BC_SALESORDERS`, `BC_FORECAST`, and `ON_HAND` use the exact
-BC property names above. Swapping the mocks for a real feed is a 1:1 replacement of those three
-constants with the authenticated GET responses — the planning math and UI don't change.
+Swapping mocks for a real feed replaces the seed data + `wbPost` with authenticated GET/POST calls —
+the stage machine, kitting, sign-off, and labor logic are unchanged.

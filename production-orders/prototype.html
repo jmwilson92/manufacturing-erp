@@ -327,6 +327,31 @@ table.tbl tbody tr.click:hover{background:var(--surface-2)}
 .attn.crit .ai{color:var(--crit)} .attn.warn .ai{color:var(--warn)}
 .attn b{font-size:13px} .attn p{margin:2px 0 0;font-size:12px;color:var(--ink-2)}
 
+/* ownership: BC (upstream, steel) vs Flow (this app, cobalt) */
+.owner{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:999px}
+.owner.bc{background:var(--surface-3);color:var(--ink-2);border:1px solid var(--border-strong)}
+.owner.flow{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-line)}
+.owner .bcmark{width:12px;height:12px;border-radius:3px;background:linear-gradient(135deg,#7A8CA6,#5B6B85);display:inline-block}
+.step.bc.current{background:var(--surface-3)}
+.step.bc.current .snode{background:var(--ink-2);border-color:var(--ink-2);color:var(--surface);box-shadow:0 0 0 4px var(--surface-3)}
+.step.bc.current .sname{color:var(--ink)}
+.step.bc.done .snode{background:var(--ink-3);border-color:var(--ink-3)}
+.handoff{width:0;position:relative}
+.handoff::before{content:"⟶ Flow picks up";position:absolute;top:-19px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);background:var(--surface);padding:0 6px}
+.col.bc{background:repeating-linear-gradient(135deg,var(--surface-2),var(--surface-2) 9px,var(--surface-3) 9px,var(--surface-3) 10px)}
+.wb{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:12.5px}
+.wb:last-child{border-bottom:0}
+.wb .wbi{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;flex:none;background:var(--good-soft);color:var(--good)}
+.wb .wbi.pending{background:var(--warn-soft);color:var(--warn)}
+.wb .wbm b{font-weight:650} .wb .wbm .wbt{font-size:11px;color:var(--ink-4);font-family:var(--mono)}
+.wb .wbi svg{width:14px;height:14px}
+.eyebrow svg{width:13px;height:13px;vertical-align:-2px}
+.attn .ai svg{width:17px;height:17px}
+.op-signed svg{width:13px;height:13px}
+.laborrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.laborrow:last-child{border-bottom:0}
+.op-signed{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--good);font-weight:600}
+.assignsel{padding:7px 10px;border:1px solid var(--border-strong);border-radius:8px;background:var(--surface);color:var(--ink);font-family:var(--sans);font-size:12.5px;font-weight:600}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
 </style>
@@ -335,24 +360,20 @@ table.tbl tbody tr.click:hover{background:var(--surface-2)}
   <nav class="rail" aria-label="Primary">
     <div class="logo">F</div>
     <button class="nav" data-view="command" aria-label="Command center"><span class="tip">Command center</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></button>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></button>
     <button class="nav" data-view="demand" aria-label="Demand from Business Central"><span class="tip">Demand · Business Central</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 5-6"/><path d="M18 7h-3M18 7v3"/></svg></button>
-    <button class="nav" data-view="create" aria-label="New order"><span class="tip">Create order</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
-    <button class="nav" data-view="routing" aria-label="Routing"><span class="tip">Routing</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="6" r="2.4"/><circle cx="19" cy="6" r="2.4"/><circle cx="12" cy="18" r="2.4"/><path d="M5 8.4v3.6a2 2 0 0 0 2 2h3M19 8.4v3.6a2 2 0 0 1-2 2h-3"/></svg></button>
-    <button class="nav" data-view="pick" aria-label="Pick and issue"><span class="tip">Pick &amp; issue</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16l-1.2 12.2a1 1 0 0 1-1 .8H6.2a1 1 0 0 1-1-.8L4 7z"/><path d="M8 7V5.5A3.5 3.5 0 0 1 11.5 2h1A3.5 3.5 0 0 1 16 5.5V7"/></svg></button>
-    <button class="nav" data-view="release" aria-label="Sign-off and release"><span class="tip">Sign-off &amp; release</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M12 3l7 3v5c0 4.5-3 8.3-7 9.5C8 20.3 5 16.5 5 12V6l7-3z"/></svg></button>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 5-6"/><path d="M18 7h-3M18 7v3"/></svg></button>
+    <button class="nav" data-view="planning" aria-label="Planning in Business Central"><span class="tip">Planning · Business Central</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/><circle cx="19" cy="18" r="2.2"/></svg></button>
+    <button class="nav" data-view="kitting" aria-label="Kitting"><span class="tip">Kitting</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></button>
     <button class="nav" data-view="floor" aria-label="Floor execution"><span class="tip">Floor terminal</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V10l6 4V10l6 4V6l6 4v11z"/></svg></button>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V10l6 4V10l6 4V6l6 4v11z"/></svg></button>
     <button class="nav" data-view="capacity" aria-label="Capacity planning"><span class="tip">Capacity planning</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l3-4 3 2 4-6"/></svg></button>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l3-4 3 2 4-6"/></svg></button>
     <div class="spacer"></div>
     <button class="nav" id="themeBtn" aria-label="Toggle theme"><span class="tip">Toggle theme</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg></button>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg></button>
   </nav>
 
   <div class="main">
@@ -364,7 +385,7 @@ table.tbl tbody tr.click:hover{background:var(--surface-2)}
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg>
         <input placeholder="Search orders, parts, work centers…" aria-label="Search">
       </div>
-      <button class="iconbtn" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button>
+      <button class="iconbtn" aria-label="Notifications"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button>
       <div class="avatar">JW</div>
     </header>
     <div class="canvas" id="canvas"></div>
@@ -377,196 +398,200 @@ table.tbl tbody tr.click:hover{background:var(--surface-2)}
 <script>
 "use strict";
 /* ============================================================
-   Mock domain model + state that actually flows through stages
+   FLOW — production execution downstream of Business Central.
+   BC owns demand + planning (Planned → Firm Planned → Released),
+   and production orders are built from PRODUCTION BOMs.
+   Flow picks the order up at RELEASED and owns everything after:
+   kitting the BOM → routing → operation sign-offs → labor time,
+   posting consumption / output / status back to BC as it goes.
    ============================================================ */
-const STAGES = [
-  {key:"draft",     name:"Draft",      icon:"edit"},
-  {key:"routed",    name:"Routed",     icon:"route"},
-  {key:"picking",   name:"Picking",    icon:"pick"},
-  {key:"released",  name:"Released",   icon:"shield"},
-  {key:"production",name:"In Production",icon:"factory"},
-  {key:"complete",  name:"Complete",   icon:"check"},
-];
-const stageIndex = k => STAGES.findIndex(s=>s.key===k);
 
-const WORKCENTERS = [
-  {id:"WC-LASER", name:"Laser Cut",   cap:16},
-  {id:"WC-BEND",  name:"Press Brake", cap:16},
-  {id:"WC-WELD",  name:"Weld Cell",   cap:24},
-  {id:"WC-MACH",  name:"CNC Mill",    cap:32},
-  {id:"WC-PAINT", name:"Powder Coat", cap:8},
-  {id:"WC-ASSY",  name:"Assembly",    cap:40},
-  {id:"WC-QA",    name:"Final QA",    cap:8},
+/* lifecycle: 3 stages owned by Business Central, 3 by Flow */
+const STAGES=[
+  {key:"planned",     name:"Planned",      owner:"bc",  icon:"edit"},
+  {key:"firmPlanned", name:"Firm Planned", owner:"bc",  icon:"route"},
+  {key:"released",    name:"Released",     owner:"bc",  icon:"shield"},
+  {key:"kitting",     name:"Kitting",      owner:"app", icon:"box"},
+  {key:"production",  name:"In Production", owner:"app", icon:"factory"},
+  {key:"finished",    name:"Finished",     owner:"app", icon:"check"},
 ];
+const stageIndex=k=>STAGES.findIndex(s=>s.key===k);
+const HANDOFF=stageIndex("kitting"); // first Flow-owned stage
 
-// standard routing template by product family
-function routingFor(family){
-  const R = {
-    frame:[
-      ["WC-LASER","Laser cut frame blanks",0.4,1.2],
-      ["WC-BEND","Form channels",0.3,0.8],
-      ["WC-WELD","Weld sub-frame",0.6,2.4],
-      ["WC-PAINT","Powder coat",0.2,1.5],
-      ["WC-ASSY","Assemble & fasten",0.8,3.1],
-      ["WC-QA","Final inspection",0.2,0.6],
-    ],
-    panel:[
-      ["WC-LASER","Laser cut panels",0.3,0.9],
-      ["WC-BEND","Brake form edges",0.25,0.7],
-      ["WC-PAINT","Powder coat",0.2,1.4],
-      ["WC-ASSY","Fit hardware",0.5,1.8],
-      ["WC-QA","Inspect finish",0.15,0.4],
-    ],
-    shaft:[
-      ["WC-MACH","Turn & mill shaft",0.9,3.6],
-      ["WC-MACH","Keyway & drill",0.4,1.4],
-      ["WC-QA","CMM inspection",0.3,0.8],
-      ["WC-ASSY","Press bearings",0.4,1.2],
-    ],
-  };
-  return (R[family]||R.frame).map((o,i)=>({
-    seq:(i+1)*10, wc:o[0], name:o[1], setup:o[2], runEa:o[3],
-    status:"pending"
+const WORKCENTERS=[
+  {id:"WC-LASER",name:"Laser Cut",cap:16},{id:"WC-BEND",name:"Press Brake",cap:16},
+  {id:"WC-WELD",name:"Weld Cell",cap:24},{id:"WC-MACH",name:"CNC Mill",cap:32},
+  {id:"WC-PAINT",name:"Powder Coat",cap:8},{id:"WC-ASSY",name:"Assembly",cap:40},
+  {id:"WC-QA",name:"Final QA",cap:8},
+];
+const OPERATORS=["A. Mercer","T. Boyd","L. Nguyen","R. Diaz"];
+const QA_INSPECTOR="S. Park";
+
+/* production BOM (components w/ qty-per) + routing per item family */
+const FAMILIES={
+  frame:{bomNo:"PBOM-FRM-A",routingNo:"RTG-FRM",
+    bom:[["STL-CH-3x2","Steel channel 3×2",4],["PLT-6MM","6mm plate 1220×2440",0.25],["WELD-ER70","ER70 wire spool",0.17],["PWD-RAL7016","Powder RAL7016 20kg",0.09],["BRG-6208","Bearing 6208-2RS",2],["FAS-M10","M10 hardware kit",1]],
+    routing:[["WC-LASER","Laser cut frame blanks",0.4,1.2],["WC-BEND","Form channels",0.3,0.8],["WC-WELD","Weld sub-frame",0.6,2.4],["WC-PAINT","Powder coat",0.2,1.5],["WC-ASSY","Assemble & fasten",0.8,3.1],["WC-QA","Final inspection",0.2,0.6]]},
+  panel:{bomNo:"PBOM-PNL-C",routingNo:"RTG-PNL",
+    bom:[["SHT-2MM","2mm sheet 1220×2440",0.5],["HNG-SS","Stainless hinge",2],["PWD-RAL9005","Powder RAL9005 20kg",0.05],["FAS-M6","M6 hardware kit",1]],
+    routing:[["WC-LASER","Laser cut panels",0.3,0.9],["WC-BEND","Brake form edges",0.25,0.7],["WC-PAINT","Powder coat",0.2,1.4],["WC-ASSY","Fit hardware",0.5,1.8],["WC-QA","Inspect finish",0.15,0.4]]},
+  shaft:{bomNo:"PBOM-SHF",routingNo:"RTG-SHF",
+    bom:[["BAR-4140","4140 alloy bar 3m",0.35],["BRG-6209","Bearing 6209-2RS",2],["KEY-12","12mm key stock",1]],
+    routing:[["WC-MACH","Turn & mill shaft",0.9,3.6],["WC-MACH","Keyway & drill",0.4,1.4],["WC-QA","CMM inspection",0.3,0.8],["WC-ASSY","Press bearings",0.4,1.2]]},
+};
+
+let PDO_SEQ=2044;
+function bomFor(family,qty){
+  return FAMILIES[family].bom.map(c=>{
+    const need=Math.ceil(c[2]*qty);
+    const avail=Math.random()<0.85?need:Math.max(0,Math.floor(need*0.6));
+    return {part:c[0],name:c[1],per:c[2],need,avail,picked:0,bin:randbin()};
+  });
+}
+function routeFor(family){
+  return FAMILIES[family].routing.map((o,i)=>({
+    seq:(i+1)*10,wc:o[0],name:o[1],setup:o[2],runEa:o[3],
+    status:"pending",operator:null,laborMin:0,signedBy:null,signedAt:null,qtyOut:0,
   }));
 }
-
-let ORD_SEQ = 4820;
 function mkOrder(o){
-  const ops = routingFor(o.family);
+  const fam=FAMILIES[o.family];
   return Object.assign({
-    id:"PO-"+(ORD_SEQ++),
-    priority:"normal",
-    picks:[], scrap:0, good:0,
-    routing:ops,
-    activeOp:0,
+    id:"PdO-"+(PDO_SEQ++), priority:"normal", scrap:0, good:0, activeOp:0,
+    bomNo:fam.bomNo, routingNo:fam.routingNo,
+    bom:o.bom||bomFor(o.family,o.qty), routing:routeFor(o.family),
+    writeback:[],
   }, o);
 }
-
-const state = {
-  view:"command",
-  orders:[
-    mkOrder({product:"Conveyor Drive Frame — 1200mm", part:"FRM-1200-A", qty:24, family:"frame", stage:"production", priority:"high",  due:"Jul 24", good:15, scrap:1, activeOp:3,
-      picks:pickset([["STL-CH-3x2","Steel channel 3×2",96,96],["PLT-6MM","6mm plate 1220×2440",6,6],["WELD-ER70","ER70 wire spool",4,4],["PWD-RAL7016","Powder RAL7016 20kg",2,2],["BRG-6208","Bearing 6208-2RS",48,48],["FAS-M10","M10 hardware kit",24,24]]) }),
-    mkOrder({product:"Guard Panel Set — Type C", part:"PNL-GC-04", qty:60, family:"panel", stage:"picking", priority:"normal", due:"Jul 26",
-      picks:pickset([["SHT-2MM","2mm sheet 1220×2440",30,30],["HNG-SS","Stainless hinge",120,120],["PWD-RAL9005","Powder RAL9005 20kg",3,1],["FAS-M6","M6 hardware kit",60,44]]) }),
-    mkOrder({product:"Output Shaft 45mm — Hardened", part:"SHF-45-H", qty:40, family:"shaft", stage:"routed", priority:"hot", due:"Jul 23",
-      picks:pickset([["BAR-45-4140","45mm 4140 bar 3m",14,14],["BRG-6209","Bearing 6209-2RS",80,80],["KEY-12","12mm key stock",40,40]]) }),
-    mkOrder({product:"Conveyor Drive Frame — 900mm", part:"FRM-900-A", qty:12, family:"frame", stage:"released", priority:"normal", due:"Jul 29",
-      picks:pickset([["STL-CH-3x2","Steel channel 3×2",36,36],["PLT-6MM","6mm plate 1220×2440",3,3],["WELD-ER70","ER70 wire spool",2,2],["PWD-RAL7016","Powder RAL7016 20kg",1,1],["BRG-6208","Bearing 6208-2RS",24,24],["FAS-M10","M10 hardware kit",12,12]]) }),
-    mkOrder({product:"Guard Panel Set — Type A", part:"PNL-GA-01", qty:36, family:"panel", stage:"draft", priority:"normal", due:"Aug 02", picks:[] }),
-    mkOrder({product:"Output Shaft 60mm", part:"SHF-60", qty:20, family:"shaft", stage:"complete", priority:"normal", due:"Jul 18", good:20, scrap:0, activeOp:4,
-      picks:pickset([["BAR-60-4140","60mm 4140 bar 3m",7,7],["BRG-6212","Bearing 6212-2RS",40,40],["KEY-16","16mm key stock",20,20]]) }),
-  ],
-  selected:null,
-  timer:{running:false, seconds:4517, order:null},
-};
-function pickset(rows){return rows.map(r=>({part:r[0],name:r[1],need:r[2],avail:r[3],picked:0,bin:randbin()}));}
 function randbin(){const a="ABCDEF"[Math.floor(Math.random()*6)];const b=String(Math.floor(Math.random()*40)+1).padStart(2,"0");const c=String(Math.floor(Math.random()*5)+1);return `${a}-${b}-${c}`;}
+function nowLabel(){return new Date().toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"});}
 
 /* ============================================================
-   Business Central integration (demand side)
-   BC is the system of record for demand: sales orders + forecast.
-   This app is the system of record for supply/execution.
-   Field names below mirror the BC API v2.0 resources so the
-   mapping to a real feed is 1:1.
-   ------------------------------------------------------------
-   GET /v2.0/{tenant}/{env}/api/v2.0/companies({id})/salesOrders
-        ?$expand=salesOrderLines&$filter=lastModifiedDateTime gt {delta}
+   Business Central — demand feeds (system of record for demand)
+   Field names mirror BC API v2.0 so a real feed is a 1:1 swap.
    ============================================================ */
-const BC = {
-  connected:true, environment:"PROD", company:"Laugh Manufacturing Ltd.",
-  lastSync:"2 min ago", tenant:"laugh.onmicrosoft.com",
-};
-// salesOrder + salesOrderLines (BC API v2.0 shape, trimmed to what planning needs)
-const BC_SALESORDERS = [
-  {id:"8b1…a01", number:"S-ORD101044", customerName:"Ridgeline Conveyors", orderDate:"2026-07-18", requestedDeliveryDate:"2026-07-31", status:"Open",
-    salesOrderLines:[{lineType:"Item", lineObjectNumber:"FRM-1200-A", description:"Conveyor Drive Frame — 1200mm", quantity:24, shippedQuantity:0}]},
-  {id:"8b1…a02", number:"S-ORD101051", customerName:"Northgate Automation", orderDate:"2026-07-19", requestedDeliveryDate:"2026-08-05", status:"Open",
-    salesOrderLines:[{lineType:"Item", lineObjectNumber:"PNL-GC-04", description:"Guard Panel Set — Type C", quantity:60, shippedQuantity:12},
-                     {lineType:"Item", lineObjectNumber:"SHF-45-H", description:"Output Shaft 45mm — Hardened", quantity:40, shippedQuantity:0}]},
-  {id:"8b1…a03", number:"S-ORD101052", customerName:"Beltway Systems", orderDate:"2026-07-20", requestedDeliveryDate:"2026-08-12", status:"Open",
-    salesOrderLines:[{lineType:"Item", lineObjectNumber:"FRM-900-A", description:"Conveyor Drive Frame — 900mm", quantity:30, shippedQuantity:0}]},
-  {id:"8b1…a04", number:"S-ORD101060", customerName:"Ridgeline Conveyors", orderDate:"2026-07-21", requestedDeliveryDate:"2026-08-14", status:"Open",
-    salesOrderLines:[{lineType:"Item", lineObjectNumber:"PNL-GA-01", description:"Guard Panel Set — Type A", quantity:48, shippedQuantity:0}]},
+const BC={connected:true,environment:"PROD",company:"Laugh Manufacturing Ltd.",lastSync:"2 min ago",tenant:"laugh.onmicrosoft.com"};
+const BC_SALESORDERS=[
+  {id:"8b1…a01",number:"S-ORD101044",customerName:"Ridgeline Conveyors",orderDate:"2026-07-18",requestedDeliveryDate:"2026-07-31",status:"Open",
+    salesOrderLines:[{lineType:"Item",lineObjectNumber:"FRM-1200-A",description:"Conveyor Drive Frame — 1200mm",quantity:24,shippedQuantity:0}]},
+  {id:"8b1…a02",number:"S-ORD101051",customerName:"Northgate Automation",orderDate:"2026-07-19",requestedDeliveryDate:"2026-08-05",status:"Open",
+    salesOrderLines:[{lineType:"Item",lineObjectNumber:"PNL-GC-04",description:"Guard Panel Set — Type C",quantity:60,shippedQuantity:12},
+                     {lineType:"Item",lineObjectNumber:"SHF-45-H",description:"Output Shaft 45mm — Hardened",quantity:40,shippedQuantity:0}]},
+  {id:"8b1…a03",number:"S-ORD101052",customerName:"Beltway Systems",orderDate:"2026-07-20",requestedDeliveryDate:"2026-08-12",status:"Open",
+    salesOrderLines:[{lineType:"Item",lineObjectNumber:"FRM-900-A",description:"Conveyor Drive Frame — 900mm",quantity:30,shippedQuantity:0}]},
+  {id:"8b1…a04",number:"S-ORD101060",customerName:"Ridgeline Conveyors",orderDate:"2026-07-21",requestedDeliveryDate:"2026-08-14",status:"Open",
+    salesOrderLines:[{lineType:"Item",lineObjectNumber:"PNL-GA-01",description:"Guard Panel Set — Type A",quantity:48,shippedQuantity:0}]},
 ];
-// Demand Forecast (BC Production Forecast Entry — exposed via custom API page)
-const BC_FORECAST = [
-  {itemNumber:"FRM-1200-A", description:"Conveyor Drive Frame — 1200mm", forecastType:"Sales Item", forecastDate:"2026-08-15", quantity:20},
-  {itemNumber:"PNL-GC-04", description:"Guard Panel Set — Type C", forecastType:"Sales Item", forecastDate:"2026-08-15", quantity:40},
-  {itemNumber:"SHF-45-H", description:"Output Shaft 45mm — Hardened", forecastType:"Sales Item", forecastDate:"2026-08-15", quantity:25},
-  {itemNumber:"SHF-60", description:"Output Shaft 60mm", forecastType:"Sales Item", forecastDate:"2026-08-15", quantity:30},
+const BC_FORECAST=[
+  {itemNumber:"FRM-1200-A",description:"Conveyor Drive Frame — 1200mm",forecastType:"Sales Item",forecastDate:"2026-08-15",quantity:20},
+  {itemNumber:"PNL-GC-04",description:"Guard Panel Set — Type C",forecastType:"Sales Item",forecastDate:"2026-08-15",quantity:40},
+  {itemNumber:"SHF-45-H",description:"Output Shaft 45mm — Hardened",forecastType:"Sales Item",forecastDate:"2026-08-15",quantity:25},
+  {itemNumber:"SHF-60",description:"Output Shaft 60mm",forecastType:"Sales Item",forecastDate:"2026-08-15",quantity:30},
 ];
-// on-hand finished goods (would come from BC items/inventory API)
-const ON_HAND = {"FRM-1200-A":0,"FRM-900-A":6,"PNL-GC-04":0,"PNL-GA-01":10,"SHF-45-H":0,"SHF-60":8};
-state.selected = state.orders[0].id;
+const ON_HAND={"FRM-1200-A":0,"FRM-900-A":6,"PNL-GC-04":0,"PNL-GA-01":10,"SHF-45-H":0,"SHF-60":8};
+const CATALOG=[
+  {part:"FRM-1200-A",name:"Conveyor Drive Frame — 1200mm",family:"frame"},
+  {part:"FRM-900-A",name:"Conveyor Drive Frame — 900mm",family:"frame"},
+  {part:"PNL-GC-04",name:"Guard Panel Set — Type C",family:"panel"},
+  {part:"PNL-GA-01",name:"Guard Panel Set — Type A",family:"panel"},
+  {part:"SHF-45-H",name:"Output Shaft 45mm — Hardened",family:"shaft"},
+  {part:"SHF-60",name:"Output Shaft 60mm",family:"shaft"},
+];
+function itemName(part){const c=CATALOG.find(x=>x.part===part);return c?c.name:part;}
+function familyOf(part){const c=CATALOG.find(x=>x.part===part);return c?c.family:"frame";}
 
-/* capacity: load per work center per day (hours committed) over 10 days */
-const DAYS = ["Mon 21","Tue 22","Wed 23","Thu 24","Fri 25","Mon 28","Tue 29","Wed 30","Thu 31","Fri 01"];
-function buildLoad(){
-  // deterministic-ish pseudo load derived from orders + noise
-  const seedbase = {"WC-LASER":[9,11,14,13,10,8,12,15,11,9],"WC-BEND":[7,9,12,10,8,6,9,11,9,7],
-    "WC-WELD":[14,18,22,26,20,16,19,23,18,15],"WC-MACH":[20,24,30,28,25,22,27,31,26,21],
-    "WC-PAINT":[5,6,8,9,7,4,6,9,7,5],"WC-ASSY":[26,31,36,34,30,28,33,38,32,27],"WC-QA":[4,5,7,8,6,3,5,8,6,4]};
-  return WORKCENTERS.map(wc=>({wc, cap:wc.cap, load:seedbase[wc.id]}));
+/* ============================================================ state + seed */
+const state={view:"command",orders:[],selected:null,timer:{running:false,seconds:0,order:null}};
+
+state.orders=[
+  mkOrder({item:"FRM-1200-A",product:"Conveyor Drive Frame — 1200mm",qty:24,family:"frame",stage:"firmPlanned",priority:"high",due:"Jul 31",source:"S-ORD101044"}),
+  mkOrder({item:"PNL-GC-04",product:"Guard Panel Set — Type C",qty:48,family:"panel",stage:"released",priority:"normal",due:"Aug 05",source:"S-ORD101051"}),
+  mkOrder({item:"SHF-45-H",product:"Output Shaft 45mm — Hardened",qty:40,family:"shaft",stage:"kitting",priority:"hot",due:"Aug 05",source:"S-ORD101051"}),
+  mkOrder({item:"FRM-900-A",product:"Conveyor Drive Frame — 900mm",qty:30,family:"frame",stage:"production",priority:"normal",due:"Aug 12",source:"S-ORD101052",good:12}),
+  mkOrder({item:"SHF-60",product:"Output Shaft 60mm",qty:20,family:"shaft",stage:"finished",priority:"normal",due:"Jul 18",source:"forecast",good:20}),
+  mkOrder({item:"PNL-GA-01",product:"Guard Panel Set — Type A",qty:48,family:"panel",stage:"planned",priority:"normal",due:"Aug 14",source:"S-ORD101060"}),
+];
+// make the hot shaft short one component to demo shortage handling
+(function(){const o=state.orders[2];o.bom[0].avail=Math.floor(o.bom[0].need*0.6);})();
+// seed the in-production order: kitted + first 2 ops signed off, op3 running
+(function(){
+  const o=state.orders[3];
+  o.bom.forEach(b=>b.picked=Math.min(b.need,b.avail));
+  wbPost(o,"Consumption journal",`Kitted ${o.bom.length} BOM lines · ${o.bomNo}`,true);
+  const seed=[["A. Mercer",74],["T. Boyd",39]];
+  seed.forEach(([op,min],i)=>{o.routing[i].status="done";o.routing[i].operator=op;o.routing[i].signedBy=op;o.routing[i].signedAt="today";o.routing[i].laborMin=min;o.routing[i].qtyOut=o.qty;
+    wbPost(o,"Output journal",`Op ${o.routing[i].seq} · ${o.qty} ea · ${(min/60).toFixed(1)}h — ${op}`,true);});
+  o.routing[2].status="active";o.routing[2].operator="L. Nguyen";o.activeOp=2;
+  state.timer={running:false,seconds:5140,order:o.id};
+})();
+// seed the finished order fully posted back
+(function(){
+  const o=state.orders[4];
+  o.bom.forEach(b=>b.picked=Math.min(b.need,b.avail));
+  wbPost(o,"Consumption journal",`Kitted ${o.bom.length} BOM lines · ${o.bomNo}`,true);
+  o.routing.forEach((r,i)=>{r.status="done";r.operator=OPERATORS[i%OPERATORS.length];r.signedBy=r.wc==="WC-QA"?QA_INSPECTOR:r.operator;r.signedAt="Jul 18";r.laborMin=Math.round((r.setup+r.runEa*o.qty)*60);r.qtyOut=o.qty;
+    wbPost(o,"Output journal",`Op ${r.seq} · ${o.qty} ea · ${(r.laborMin/60).toFixed(1)}h — ${r.operator}`,true);});
+  wbPost(o,"Status → Finished",`Production order closed · ${o.good} good`,true);
+})();
+state.selected=state.orders[3].id;
+
+/* write-back helper (posts to Business Central) */
+function wbPost(o,type,detail,silent){
+  o.writeback.unshift({ts:nowLabel(),type,detail,status:"posted"});
+  if(!silent)toast(`Posted to Business Central · ${type}`);
 }
-const CAPACITY = buildLoad();
+
+/* capacity (unchanged model) */
+const DAYS=["Mon 21","Tue 22","Wed 23","Thu 24","Fri 25","Mon 28","Tue 29","Wed 30","Thu 31","Fri 01"];
+const CAPACITY=(function(){
+  const s={"WC-LASER":[9,11,14,13,10,8,12,15,11,9],"WC-BEND":[7,9,12,10,8,6,9,11,9,7],"WC-WELD":[14,18,22,26,20,16,19,23,18,15],"WC-MACH":[20,24,30,28,25,22,27,31,26,21],"WC-PAINT":[5,6,8,9,7,4,6,9,7,5],"WC-ASSY":[26,31,36,34,30,28,33,38,32,27],"WC-QA":[4,5,7,8,6,3,5,8,6,4]};
+  return WORKCENTERS.map(wc=>({wc,cap:wc.cap,load:s[wc.id]}));
+})();
 
 /* ============================================================ icons */
-const I = {
-  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
-  route:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="5" r="2.2"/><path d="M8 19h6a4 4 0 0 0 4-4V7"/></svg>',
-  pick:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16l-1 12H5z"/><path d="M8 7V5a4 4 0 0 1 8 0v2"/></svg>',
-  shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 9.5C8 20.3 5 16.5 5 12V6z"/></svg>',
-  factory:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V10l6 4V10l6 4V7l6 3v11z"/></svg>',
-  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>',
-  checkc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>',
-  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>',
-  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
-  alert:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>',
-  arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
-  play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
-  pause:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
-  drag:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>',
-  box:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>',
-  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>',
+const I={
+  edit:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+  route:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="5" r="2.2"/><path d="M8 19h6a4 4 0 0 0 4-4V7"/></svg>',
+  box:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>',
+  shield:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 9.5C8 20.3 5 16.5 5 12V6z"/></svg>',
+  factory:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V10l6 4V10l6 4V7l6 3v11z"/></svg>',
+  check:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>',
+  checkc:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>',
+  x:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>',
+  clock:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  alert:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>',
+  arrow:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  play:'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+  pause:'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
+  user:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.4"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>',
+  pen:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+  sync:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5M3 21v-5h5"/></svg>',
+  plus:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>',
 };
 
 /* ============================================================ helpers */
 function el(html){const t=document.createElement("template");t.innerHTML=html.trim();return t.content.firstElementChild;}
-function stageOf(o){return o.stage;}
-function pri(o){return o.priority;}
-function priPill(p){
-  if(p==="hot")return '<span class="pill crit"><span class="dot"></span>Hot</span>';
-  if(p==="high")return '<span class="pill warn"><span class="dot"></span>High</span>';
-  return '<span class="pill neutral">Normal</span>';
-}
-function shortCount(o){return o.picks.filter(p=>p.avail<p.need).length;}
-function pickProgress(o){if(!o.picks.length)return 0;const t=o.picks.reduce((a,p)=>a+p.need,0);const d=o.picks.reduce((a,p)=>a+Math.min(p.picked,p.need),0);return Math.round(d/t*100);}
+function priPill(p){if(p==="hot")return '<span class="pill crit"><span class="dot"></span>Hot</span>';if(p==="high")return '<span class="pill warn"><span class="dot"></span>High</span>';return '<span class="pill neutral">Normal</span>';}
+function ownerBadge(owner){return owner==="bc"?'<span class="owner bc"><span class="bcmark"></span>Business Central</span>':'<span class="owner flow">Flow · this app</span>';}
+function shortCount(o){return o.bom.filter(p=>p.avail<p.need).length;}
+function kitProgress(o){if(!o.bom.length)return 0;const t=o.bom.reduce((a,p)=>a+p.need,0);const d=o.bom.reduce((a,p)=>a+Math.min(p.picked,p.need),0);return Math.round(d/t*100);}
 function opProgress(o){const done=o.routing.filter(r=>r.status==="done").length;return Math.round(done/o.routing.length*100);}
-function toast(msg){
-  const t=el(`<div class="toast">${I.checkc}<span>${msg}</span></div>`);
-  document.getElementById("toasts").appendChild(t);
-  setTimeout(()=>{t.style.opacity="0";t.style.transform="translateY(8px)";setTimeout(()=>t.remove(),250);},2600);
-}
-function seqColor(pct){ // 0..100 sequential blue, >100 critical
-  if(pct>100)return null;
-  const stops=["--seq-0","--seq-1","--seq-2","--seq-3","--seq-4","--seq-5"];
-  const i=Math.min(5,Math.floor(pct/100*5.999));
-  return `var(${stops[i]})`;
-}
+function laborHrs(o){return o.routing.reduce((a,r)=>a+r.laborMin,0)/60;}
 function selOrder(){return state.orders.find(o=>o.id===state.selected);}
+function toast(msg){const t=el(`<div class="toast">${I.checkc}<span>${msg}</span></div>`);document.getElementById("toasts").appendChild(t);setTimeout(()=>{t.style.opacity="0";t.style.transform="translateY(8px)";setTimeout(()=>t.remove(),250);},2600);}
+function seqColor(pct){if(pct>100)return null;const s=["--seq-0","--seq-1","--seq-2","--seq-3","--seq-4","--seq-5"];return `var(${s[Math.min(5,Math.floor(pct/100*5.999))]})`;}
+function fmtTime(s){const h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;}
 
 /* ============================================================ router */
 const VIEW_META={
   command:["Command center","Shop-wide status"],
-  demand:["Demand · Business Central","Sales orders & forecast → planned supply"],
-  create:["New production order","Draft with live feasibility"],
-  routing:["Routing","Operations & work centers"],
-  pick:["Pick & issue","Stage components to the floor"],
-  release:["Sign-off & release","Readiness gate"],
-  floor:["Floor terminal","Operator execution"],
+  demand:["Demand · Business Central","Sales orders & forecast"],
+  planning:["Planning · Business Central","Production orders by BOM — Planned → Firm → Released"],
+  kitting:["Kitting","Kit the production BOM to released orders"],
+  floor:["Floor terminal","Routing execution · sign-off · labor time"],
   capacity:["Capacity planning","Finite load by work center"],
 };
+const canvas=document.getElementById("canvas");
 function go(view){
   state.view=view;
   document.querySelectorAll(".rail .nav").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
@@ -574,738 +599,421 @@ function go(view){
   document.getElementById("viewTitle").textContent=m[0];
   document.getElementById("viewCrumb").textContent=m[1];
   render();
-  document.querySelector(".main").scrollTo({top:0});
   window.scrollTo({top:0,behavior:"instant"});
 }
 document.querySelectorAll(".rail .nav[data-view]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.view)));
-
-/* ============================================================ RENDER */
-const canvas=document.getElementById("canvas");
 function render(){
   canvas.innerHTML="";
-  ({command:viewCommand,demand:viewDemand,create:viewCreate,routing:viewRouting,pick:viewPick,
-    release:viewRelease,floor:viewFloor,capacity:viewCapacity}[state.view])();
+  ({command:viewCommand,demand:viewDemand,planning:viewPlanning,kitting:viewKitting,floor:viewFloor,capacity:viewCapacity}[state.view])();
 }
+function routeForStage(o){const map={planned:"planning",firmPlanned:"planning",released:"kitting",kitting:"kitting",production:"floor",finished:"floor"};go(map[o.stage]||"command");}
 
-/* -------- lifecycle stepper (shared spine) -------- */
+/* -------- shared: lifecycle stepper with ownership -------- */
 function stepper(o){
   const cur=stageIndex(o.stage);
-  const meta=(k)=>{
-    if(k==="picking")return `${pickProgress(o)}% staged`;
+  const meta=k=>{
+    if(k==="firmPlanned")return o.bomNo;
+    if(k==="released")return "picked up by Flow";
+    if(k==="kitting")return `${kitProgress(o)}% kitted`;
     if(k==="production")return `${opProgress(o)}% ops`;
-    if(k==="routed")return `${o.routing.length} ops`;
-    if(k==="complete")return `${o.good}/${o.qty} good`;
+    if(k==="finished")return "posted to BC";
     return "";
   };
-  return `<div class="stepper" role="list">${STAGES.map((s,i)=>{
-    const cls=i<cur?"done":i===cur?"current":"";
-    const ic=i<cur?I.check:I[s.icon];
+  return `<div style="display:flex;justify-content:space-between;margin-bottom:8px;padding:0 4px">
+      <span class="owner bc"><span class="bcmark"></span>Business Central · planning</span>
+      <span class="owner flow">Flow · execution &amp; write-back</span></div>
+    <div class="stepper" role="list">${STAGES.map((s,i)=>{
+    const cls=(i<cur?"done":i===cur?"current":"")+(s.owner==="bc"?" bc":"");
     return `<div class="step ${cls}" role="listitem">
       <div class="snode">${i<cur?I.check:`<span>${i+1}</span>`}</div>
       <div class="sname">${s.name}</div>
       <div class="smeta">${meta(s.key)}</div>
     </div>`;}).join("")}</div>`;
 }
-
-/* -------- order context header (shared) -------- */
 function orderHeader(o,actionHtml){
+  const st=STAGES[stageIndex(o.stage)];
   return `<div class="card pad" style="margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
     <div>
       <div class="row" style="gap:9px;flex-wrap:wrap">
-        <span class="tag">${o.id}</span>${priPill(o.priority)}
-        <span class="pill accent">${o.part}</span>
-        ${o.source?`<span class="pill info" title="Originated from Business Central demand"><span class="dot"></span>${o.source}</span>`:""}
+        <span class="tag">${o.id}</span>${priPill(o.priority)}${ownerBadge(st.owner)}
+        <span class="pill accent">${o.item}</span>
+        <span class="tag" title="Production BOM">${o.bomNo}</span>
+        ${o.source&&o.source!=="forecast"?`<span class="pill info" title="Originating sales order in Business Central"><span class="dot"></span>${o.source}</span>`:o.source==="forecast"?`<span class="pill info"><span class="dot"></span>Forecast</span>`:""}
       </div>
       <div style="font-size:18px;font-weight:700;letter-spacing:-.02em;margin-top:7px">${o.product}</div>
     </div>
     <div class="grow" style="flex:1"></div>
-    <div style="text-align:right">
-      <div class="eyebrow">Quantity</div>
-      <div class="num" style="font-size:20px;font-weight:700">${o.qty}<small style="color:var(--ink-3);font-weight:600"> ea</small></div>
-    </div>
-    <div style="text-align:right">
-      <div class="eyebrow">Due</div>
-      <div class="num" style="font-size:20px;font-weight:700">${o.due}</div>
-    </div>
+    <div style="text-align:right"><div class="eyebrow">Quantity</div><div class="num" style="font-size:20px;font-weight:700">${o.qty}<small style="color:var(--ink-3);font-weight:600"> ea</small></div></div>
+    <div style="text-align:right"><div class="eyebrow">Due</div><div class="num" style="font-size:20px;font-weight:700">${o.due}</div></div>
     ${actionHtml||""}
   </div>`;
 }
-
-/* order picker dropdown used across stage views */
-function orderPicker(){
-  const opts=state.orders.map(o=>`<option value="${o.id}" ${o.id===state.selected?"selected":""}>${o.id} · ${o.product}</option>`).join("");
-  return `<div class="row" style="margin-bottom:16px">
-    <span class="eyebrow">Working order</span>
-    <select id="ordSel" style="min-width:340px;padding:8px 11px;border:1px solid var(--border-strong);border-radius:9px;background:var(--surface);color:var(--ink);font-family:var(--sans);font-size:13.5px;font-weight:600">${opts}</select>
-    <span class="crumb">Stage: <b style="color:var(--ink-2)">${STAGES[stageIndex(selOrder().stage)].name}</b></span>
-  </div>`;
+function orderPicker(stages){
+  const list=state.orders.filter(o=>stages.includes(o.stage));
+  if(!list.some(o=>o.id===state.selected)&&list[0])state.selected=list[0].id;
+  const opts=list.map(o=>`<option value="${o.id}" ${o.id===state.selected?"selected":""}>${o.id} · ${o.product}</option>`).join("");
+  return {html:`<div class="row" style="margin-bottom:16px">
+      <span class="eyebrow">Working order</span>
+      <select id="ordSel" style="min-width:340px;padding:8px 11px;border:1px solid var(--border-strong);border-radius:9px;background:var(--surface);color:var(--ink);font-family:var(--sans);font-size:13.5px;font-weight:600">${opts||'<option>None in this stage</option>'}</select>
+    </div>`, list};
 }
-function wireOrderPicker(){
-  const s=document.getElementById("ordSel");
-  if(s)s.addEventListener("change",()=>{state.selected=s.value;render();});
-}
+function wireOrderPicker(){const s=document.getElementById("ordSel");if(s)s.addEventListener("change",()=>{state.selected=s.value;render();});}
 
 /* ============================================================ 1. COMMAND CENTER */
 function viewCommand(){
+  const awaiting=state.orders.filter(o=>o.stage==="released").length;
   const onFloor=state.orders.filter(o=>o.stage==="production").length;
-  const late=state.orders.filter(o=>["Jul 18","Jul 23"].includes(o.due)&&o.stage!=="complete").length;
-  const shortages=state.orders.reduce((a,o)=>a+shortCount(o),0);
-  const wip=state.orders.filter(o=>!["complete","draft"].includes(o.stage)).length;
+  const finished=state.orders.filter(o=>o.stage==="finished").length;
+  const labor=state.orders.reduce((a,o)=>a+laborHrs(o),0);
 
   canvas.appendChild(el(`<div class="grid kpis" style="margin-bottom:18px">
-    ${statTile("Open WIP","",wip,"orders","up","+2 vs last wk",spark([4,5,5,6,5,7,6]))}
-    ${statTile("On the floor","",onFloor,"running","up","live",spark([1,1,2,1,2,2,2]))}
-    ${statTile("Late / at-risk","",late,"orders", late? "down":"up", late?"needs action":"clear",spark([2,1,1,2,1,1,1]),late?"crit":null)}
-    ${statTile("Material shortages","",shortages,"lines",shortages?"down":"up",shortages?"1 blocking":"none",spark([3,2,2,1,2,1,1]),shortages?"warn":null)}
+    ${statTile("Released · awaiting kitting",awaiting,"orders",awaiting?"warn":null,awaiting?"from Business Central":"clear",spark([0,1,1,2,1,1,awaiting]))}
+    ${statTile("On the floor",onFloor,"running",null,"live",spark([1,1,2,1,2,2,onFloor]))}
+    ${statTile("Finished → posted to BC",finished,"orders",null,"synced",spark([2,3,3,4,3,4,4]))}
+    ${statTile("Labor booked",labor.toFixed(1),"hours",null,"today",spark([3,5,6,5,7,6,8]))}
   </div>`));
 
-  // attention strip
-  const unplanned=planRequirements().filter(r=>r.net>0).length;
   const attn=el(`<div class="grid" style="grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px"></div>`);
-  attn.appendChild(el(`<div class="attn crit"><span class="ai">${I.alert}</span><div><b>PO-4822 · Output Shaft 45mm is hot &amp; due Jul 23</b><p>Routed but not picked — 0% staged. Start picking to hold the date.</p></div></div>`));
-  attn.appendChild(el(`<div class="attn warn"><span class="ai">${I.alert}</span><div><b>PO-4819 · Guard Panel Set short on RAL9005 powder</b><p>Need 3, only 1 on hand. Backorder 2 or substitute finish before release.</p></div></div>`));
-  const demandAttn=el(`<div class="attn" style="background:var(--accent-soft);border-color:var(--accent-line);cursor:pointer"><span class="ai" style="color:var(--accent)">${I.box}</span><div><b>${unplanned} item(s) with unplanned demand from Business Central</b><p style="color:var(--ink-2)">New sales orders &amp; forecast exceed supply. Open the planner to convert them to production orders.</p></div></div>`);
-  demandAttn.addEventListener("click",()=>go("demand"));
-  attn.appendChild(demandAttn);
+  const rel=state.orders.find(o=>o.stage==="released");
+  if(rel){const a=el(`<div class="attn warn" style="cursor:pointer"><span class="ai">${I.arrow}</span><div><b>${rel.id} released from Business Central</b><p>${rel.product} — kit the ${rel.bomNo} BOM to start it down the routing.</p></div></div>`);a.addEventListener("click",()=>{state.selected=rel.id;go("kitting");});attn.appendChild(a);}
+  const short=state.orders.find(o=>o.stage==="kitting"&&shortCount(o)>0);
+  if(short){const a=el(`<div class="attn crit" style="cursor:pointer"><span class="ai">${I.alert}</span><div><b>${short.id} short ${shortCount(short)} BOM line(s)</b><p>Kit what's available and backorder the rest, or substitute.</p></div></div>`);a.addEventListener("click",()=>{state.selected=short.id;go("kitting");});attn.appendChild(a);}
+  const unplanned=planRequirements().filter(r=>r.net>0).length;
+  const a3=el(`<div class="attn" style="background:var(--accent-soft);border-color:var(--accent-line);cursor:pointer"><span class="ai" style="color:var(--accent)">${I.box}</span><div><b>${unplanned} item(s) with unplanned demand</b><p style="color:var(--ink-2)">New sales orders &amp; forecast in BC exceed supply — review in planning.</p></div></div>`);
+  a3.addEventListener("click",()=>go("planning"));attn.appendChild(a3);
   canvas.appendChild(attn);
 
-  // board + capacity
-  const split=el(`<div class="grid" style="grid-template-columns:1fr;gap:18px"></div>`);
-  // Kanban board
-  const boardWrap=el(`<div class="card pad"></div>`);
-  boardWrap.appendChild(el(`<div class="section-head"><div><div class="eyebrow">Live pipeline</div><h3 class="h2">Every order, one glance</h3></div>
-    <button class="btn primary sm" id="newBtn">${I.plus}New order</button></div>`));
+  // board
+  const boardWrap=el(`<div class="card pad" style="margin-bottom:18px"></div>`);
+  boardWrap.appendChild(el(`<div class="section-head"><div><div class="eyebrow">Live pipeline · Business Central → Flow</div><h3 class="h2">Every order, one glance</h3></div>
+    <div class="legend"><span class="sw"><span class="owner bc" style="padding:1px 7px"><span class="bcmark"></span>BC</span></span><span class="sw"><span class="owner flow" style="padding:1px 7px">Flow</span></span></div></div>`));
   const board=el(`<div class="board"></div>`);
   STAGES.forEach(s=>{
     const items=state.orders.filter(o=>o.stage===s.key);
-    const col=el(`<div class="col"><h4>${s.name}<span class="cnt">${items.length}</span></h4></div>`);
+    const col=el(`<div class="col ${s.owner==="bc"?"bc":""}"><h4>${s.name}<span class="cnt">${items.length}</span></h4></div>`);
     items.forEach(o=>{
-      const prog = s.key==="picking"?pickProgress(o): s.key==="production"?opProgress(o): s.key==="complete"?100:0;
+      const prog=s.key==="kitting"?kitProgress(o):s.key==="production"?opProgress(o):s.key==="finished"?100:0;
       const c=el(`<div class="pcard pr-${o.priority} ${o.id===state.selected?"sel":""}" tabindex="0">
-        <div class="pid">${o.id}</div>
-        <div class="pname">${o.product}</div>
+        <div class="pid">${o.id}</div><div class="pname">${o.product}</div>
         <div class="prow"><span class="qty">${o.qty} ea</span><span>${o.due}</span></div>
-        ${prog?`<div class="mini-prog"><i style="width:${prog}%"></i></div>`:""}
-      </div>`);
-      c.addEventListener("click",()=>{state.selected=o.id; routeForStage(o);});
+        ${prog?`<div class="mini-prog"><i style="width:${prog}%"></i></div>`:""}</div>`);
+      c.addEventListener("click",()=>{state.selected=o.id;routeForStage(o);});
       col.appendChild(c);
     });
     board.appendChild(col);
   });
   boardWrap.appendChild(board);
-  split.appendChild(boardWrap);
+  canvas.appendChild(boardWrap);
 
-  // mini capacity snapshot
+  // capacity + write-back feed
+  const split=el(`<div class="grid" style="grid-template-columns:1.3fr 1fr;gap:16px"></div>`);
   const cap=el(`<div class="card pad"></div>`);
-  cap.appendChild(el(`<div class="section-head"><div><div class="eyebrow">This week</div><h3 class="h2">Work-center load</h3></div>
-    <button class="btn ghost sm" id="capMore">Open planner ${I.arrow}</button></div>`));
-  CAPACITY.forEach(row=>{
-    const today=row.load[3]; const pct=Math.round(today/row.cap*100);
-    const over=pct>100;
-    const fill=over?"var(--crit)":pct>85?"var(--warn)":"var(--accent)";
-    cap.appendChild(el(`<div class="loadbar">
-      <span class="lbl">${row.wc.name}</span>
-      <span class="track"><span class="fill" style="width:${Math.min(pct,100)}%;background:${fill}"></span><span class="capline"></span></span>
-      <span class="pct" style="color:${over?'var(--crit)':pct>85?'var(--warn)':'var(--ink-2)'}">${pct}%</span>
-    </div>`));
-  });
-  cap.appendChild(el(`<div class="legend" style="margin-top:12px"><span class="sw"><i style="background:var(--accent)"></i>Under 85%</span><span class="sw"><i style="background:var(--warn)"></i>85–100%</span><span class="sw"><i style="background:var(--crit)"></i>Over capacity</span><span class="sw"><i style="width:2px;background:var(--ink-3)"></i>100% line</span></div>`));
+  cap.appendChild(el(`<div class="section-head"><div><div class="eyebrow">This week</div><h3 class="h2">Work-center load</h3></div><button class="btn ghost sm" id="capMore">Planner ${I.arrow}</button></div>`));
+  CAPACITY.forEach(row=>{const pct=Math.round(row.load[3]/row.cap*100);const over=pct>100;
+    cap.appendChild(el(`<div class="loadbar"><span class="lbl">${row.wc.name}</span>
+      <span class="track"><span class="fill" style="width:${Math.min(pct,100)}%;background:${over?'var(--crit)':pct>85?'var(--warn)':'var(--accent)'}"></span><span class="capline"></span></span>
+      <span class="pct" style="color:${over?'var(--crit)':pct>85?'var(--warn)':'var(--ink-2)'}">${pct}%</span></div>`));});
   split.appendChild(cap);
+
+  const feed=el(`<div class="card pad"></div>`);
+  feed.appendChild(el(`<div class="section-head"><div><div class="eyebrow">${I.sync} Two-way sync</div><h3 class="h2">Posted to Business Central</h3></div></div>`));
+  const posts=[];
+  state.orders.forEach(o=>o.writeback.slice(0,3).forEach(w=>posts.push({o,w})));
+  posts.slice(0,7).forEach(({o,w})=>feed.appendChild(el(`<div class="wb"><span class="wbi">${I.checkc}</span>
+    <div class="wbm"><b>${w.type}</b> · <span class="mono">${o.id}</span><br><span class="muted" style="font-size:12px">${w.detail}</span> <span class="wbt">${w.ts}</span></div></div>`)));
+  if(!posts.length)feed.appendChild(el(`<div class="sub">No postings yet.</div>`));
+  split.appendChild(feed);
   canvas.appendChild(split);
 
-  document.getElementById("newBtn").addEventListener("click",()=>go("create"));
   document.getElementById("capMore").addEventListener("click",()=>go("capacity"));
 }
-function routeForStage(o){
-  const map={draft:"create",routed:"routing",picking:"pick",released:"release",production:"floor",complete:"floor"};
-  go(map[o.stage]||"command");
+function statTile(label,val,unit,tone,delta,sparkSvg){
+  return `<div class="card stat"><div class="label">${label}</div>
+    <div class="val">${val}<small> ${unit}</small></div>
+    <div class="delta up" ${tone?`style="color:var(--${tone})"`:""}>${delta}</div>
+    <div class="spark">${sparkSvg}</div></div>`;
 }
-function statTile(label,pre,val,unit,dir,delta,sparkSvg,tone){
-  const dc = dir==="up"?"up":"down";
-  return `<div class="card stat">
-    <div class="label">${label}</div>
-    <div class="val">${pre}${val}<small> ${unit}</small></div>
-    <div class="delta ${dc}" ${tone?`style="color:var(--${tone})"`:""}>${delta}</div>
-    <div class="spark">${sparkSvg}</div>
-  </div>`;
-}
-function spark(vals){
-  const w=64,h=26,max=Math.max(...vals),min=Math.min(...vals),rng=(max-min)||1;
+function spark(vals){const w=64,h=26,max=Math.max(...vals),min=Math.min(...vals),rng=(max-min)||1;
   const pts=vals.map((v,i)=>[i/(vals.length-1)*w,h-((v-min)/rng)*(h-4)-2]);
   const d=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
   const area=`M0 ${h} `+pts.map(p=>"L"+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ")+` L${w} ${h} Z`;
-  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none">
-    <path d="${area}" fill="var(--accent-soft)"/>
-    <path d="${d}" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="${pts[pts.length-1][0].toFixed(1)}" cy="${pts[pts.length-1][1].toFixed(1)}" r="2.4" fill="var(--accent)"/>
-  </svg>`;
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><path d="${area}" fill="var(--accent-soft)"/><path d="${d}" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${pts[pts.length-1][0].toFixed(1)}" cy="${pts[pts.length-1][1].toFixed(1)}" r="2.4" fill="var(--accent)"/></svg>`;
 }
 
-/* ============================================================ 1b. DEMAND (Business Central) + planning bridge */
-function itemName(part){
-  const c=CATALOG.find(x=>x.part===part); if(c)return c.name;
-  const s=BC_SALESORDERS.flatMap(o=>o.salesOrderLines).find(l=>l.lineObjectNumber===part);
-  return s?s.description:part;
-}
-function familyOf(part){const c=CATALOG.find(x=>x.part===part);return c?c.family:"frame";}
-// aggregate BC demand + existing supply into net requirements
-function planRequirements(){
-  const items={};
-  const add=(part,desc,qty,src)=>{const k=part;items[k]=items[k]||{part,desc,so:0,fc:0,onHand:ON_HAND[part]||0,onOrder:0};
-    if(src==="so")items[k].so+=qty; else items[k].fc+=qty;};
-  BC_SALESORDERS.forEach(o=>o.salesOrderLines.forEach(l=>{
-    const open=l.quantity-l.shippedQuantity; if(open>0)add(l.lineObjectNumber,l.description,open,"so");}));
-  BC_FORECAST.forEach(f=>add(f.itemNumber,f.description,f.quantity,"fc"));
-  // supply already scheduled here (open production orders)
-  state.orders.filter(o=>o.stage!=="complete").forEach(o=>{if(items[o.part])items[o.part].onOrder+=o.qty;});
-  return Object.values(items).map(it=>{
-    const gross=it.so+it.fc; const net=Math.max(0, gross-it.onHand-it.onOrder);
-    return {...it, gross, net, covered:net===0};
-  }).sort((a,b)=>b.net-a.net);
-}
+/* ============================================================ 2. DEMAND (BC) */
 function viewDemand(){
-  // sync status strip
   canvas.appendChild(el(`<div class="card pad" style="margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;border-left:3px solid var(--good)">
-    <div class="row" style="gap:10px">
-      <span style="width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:var(--good-soft);color:var(--good)">${I.checkc}</span>
-      <div><b style="font-size:14px">Connected to Business Central</b>
-        <div class="sub" style="font-size:12px">${BC.company} · env <span class="tag" style="padding:1px 6px">${BC.environment}</span> · ${BC.tenant}</div></div>
-    </div>
+    <div class="row" style="gap:10px"><span style="width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:var(--good-soft);color:var(--good)">${I.checkc}</span>
+      <div><b style="font-size:14px">Connected to Business Central</b><div class="sub" style="font-size:12px">${BC.company} · env <span class="tag" style="padding:1px 6px">${BC.environment}</span> · ${BC.tenant}</div></div></div>
     <div class="grow" style="flex:1"></div>
     <div style="text-align:right"><div class="eyebrow">Sales orders</div><div class="num" style="font-weight:700">${BC_SALESORDERS.length}</div></div>
     <div style="text-align:right"><div class="eyebrow">Forecast lines</div><div class="num" style="font-weight:700">${BC_FORECAST.length}</div></div>
     <div style="text-align:right"><div class="eyebrow">Last sync</div><div class="num" style="font-weight:700">${BC.lastSync}</div></div>
-    <button class="btn sm" id="syncBtn">${I.route}Sync now</button>
-  </div>`));
+    <button class="btn sm" id="syncBtn">${I.sync}Sync now</button></div>`));
 
-  canvas.appendChild(el(`<div class="attn" style="margin-bottom:16px;background:var(--accent-soft);border-color:var(--accent-line)">
-    <span class="ai" style="color:var(--accent)">${I.arrow}</span>
-    <div><b>Demand drives supply.</b><p style="color:var(--ink-2)">Sales orders and forecasts stay owned in Business Central. This planner nets them against on-hand stock and open production orders, then suggests exactly what to build — one click turns a shortfall into a routed production order.</p></div></div>`));
+  canvas.appendChild(el(`<div class="attn" style="margin-bottom:16px"><span class="ai" style="color:var(--ink-3)">${I.box}</span>
+    <div><b>Demand stays in Business Central.</b><p>Forecasts and sales orders are owned upstream. Flow reads them to drive planning — it never re-keys them. Turning demand into production orders happens in <b>Planning</b>.</p></div></div>`));
 
-  // ---- PLANNING BRIDGE: net requirements ----
-  const reqs=planRequirements();
-  const planCard=el(`<div class="card" style="margin-bottom:18px"></div>`);
-  planCard.appendChild(el(`<div class="pad" style="border-bottom:1px solid var(--border);display:flex;align-items:flex-end;justify-content:space-between">
-    <div><div class="eyebrow">Planning worksheet</div><h3 class="h2">Net requirements → suggested production</h3></div>
-    <span class="sub">${reqs.filter(r=>r.net>0).length} item(s) need action</span></div>`));
-  const ptbl=el(`<table class="tbl"><thead><tr>
-    <th>Item</th><th class="right">Sales orders</th><th class="right">Forecast</th><th class="right">On hand</th><th class="right">On order</th><th class="right">Net req.</th><th>Coverage</th><th></th>
-  </tr></thead><tbody></tbody></table>`);
-  const ptb=ptbl.querySelector("tbody");
-  reqs.forEach(r=>{
-    const tr=el(`<tr>
-      <td><b style="font-weight:650">${r.desc}</b><br><span class="tag">${r.part}</span></td>
-      <td class="right num">${r.so||"—"}</td>
-      <td class="right num" style="color:var(--ink-3)">${r.fc||"—"}</td>
-      <td class="right num">${r.onHand||"—"}</td>
-      <td class="right num">${r.onOrder||"—"}</td>
-      <td class="right num" style="font-weight:700;color:${r.net>0?'var(--warn)':'var(--ink)'}">${r.net||0}</td>
-      <td>${r.covered?'<span class="pill good"><span class="dot"></span>Covered</span>':'<span class="pill warn"><span class="dot"></span>Short '+r.net+'</span>'}</td>
-      <td class="right">${r.net>0?`<button class="btn primary sm" data-plan="${r.part}" data-qty="${r.net}">Plan PO</button>`:'<span class="muted" style="font-size:12px">—</span>'}</td>
-    </tr>`);
-    ptb.appendChild(tr);
-  });
-  planCard.appendChild(el(`<div style="overflow-x:auto"></div>`)).appendChild(ptbl);
-  canvas.appendChild(planCard);
-
-  // ---- raw BC feeds (provenance) ----
   const split=el(`<div class="grid" style="grid-template-columns:1fr 1fr;gap:16px"></div>`);
-  // sales orders feed
   const soCard=el(`<div class="card"></div>`);
-  soCard.appendChild(el(`<div class="pad" style="border-bottom:1px solid var(--border)"><div class="eyebrow">salesOrders + salesOrderLines</div><span class="sub">Live feed · BC API v2.0</span></div>`));
+  soCard.appendChild(el(`<div class="pad" style="border-bottom:1px solid var(--border)"><div class="eyebrow">salesOrders + salesOrderLines</div><span class="sub">BC API v2.0 · live feed</span></div>`));
   const soT=el(`<table class="tbl"><thead><tr><th>Order</th><th>Customer</th><th>Item / qty</th><th class="right">Deliver by</th></tr></thead><tbody></tbody></table>`);
-  BC_SALESORDERS.forEach(o=>{
-    const lines=o.salesOrderLines.map(l=>`${l.lineObjectNumber} ×${l.quantity}${l.shippedQuantity?` <span class="muted">(${l.shippedQuantity} shipped)</span>`:""}`).join("<br>");
-    soT.querySelector("tbody").appendChild(el(`<tr>
-      <td><span class="mono" style="font-weight:600">${o.number}</span><br><span class="pill neutral" style="font-size:10px">${o.status}</span></td>
-      <td style="font-size:12.5px">${o.customerName}</td>
-      <td style="font-size:12px" class="mono">${lines}</td>
-      <td class="right num" style="font-size:12px">${o.requestedDeliveryDate.slice(5)}</td></tr>`));
-  });
+  BC_SALESORDERS.forEach(o=>{const lines=o.salesOrderLines.map(l=>`${l.lineObjectNumber} ×${l.quantity}${l.shippedQuantity?` <span class="muted">(${l.shippedQuantity} shipped)</span>`:""}`).join("<br>");
+    soT.querySelector("tbody").appendChild(el(`<tr><td><span class="mono" style="font-weight:600">${o.number}</span><br><span class="pill neutral" style="font-size:10px">${o.status}</span></td><td style="font-size:12.5px">${o.customerName}</td><td class="mono" style="font-size:12px">${lines}</td><td class="right num" style="font-size:12px">${o.requestedDeliveryDate.slice(5)}</td></tr>`));});
   soCard.appendChild(el(`<div style="overflow-x:auto"></div>`)).appendChild(soT);
   split.appendChild(soCard);
-  // forecast feed
+
   const fcCard=el(`<div class="card"></div>`);
   fcCard.appendChild(el(`<div class="pad" style="border-bottom:1px solid var(--border)"><div class="eyebrow">Demand forecast</div><span class="sub">Production Forecast Entry · custom API page</span></div>`));
-  const fcT=el(`<table class="tbl"><thead><tr><th>Item</th><th>Type</th><th class="right">Qty</th><th class="right">Forecast date</th></tr></thead><tbody></tbody></table>`);
-  BC_FORECAST.forEach(f=>{
-    fcT.querySelector("tbody").appendChild(el(`<tr>
-      <td><b style="font-weight:600;font-size:12.5px">${f.description}</b><br><span class="tag">${f.itemNumber}</span></td>
-      <td><span class="pill info" style="font-size:10px">${f.forecastType}</span></td>
-      <td class="right num">${f.quantity}</td>
-      <td class="right num" style="font-size:12px">${f.forecastDate.slice(5)}</td></tr>`));
-  });
+  const fcT=el(`<table class="tbl"><thead><tr><th>Item</th><th>Type</th><th class="right">Qty</th><th class="right">Date</th></tr></thead><tbody></tbody></table>`);
+  BC_FORECAST.forEach(f=>fcT.querySelector("tbody").appendChild(el(`<tr><td><b style="font-weight:600;font-size:12.5px">${f.description}</b><br><span class="tag">${f.itemNumber}</span></td><td><span class="pill info" style="font-size:10px">${f.forecastType}</span></td><td class="right num">${f.quantity}</td><td class="right num" style="font-size:12px">${f.forecastDate.slice(5)}</td></tr>`)));
   fcCard.appendChild(el(`<div style="overflow-x:auto"></div>`)).appendChild(fcT);
   split.appendChild(fcCard);
   canvas.appendChild(split);
 
-  // wire
-  ptb.querySelectorAll("[data-plan]").forEach(b=>b.addEventListener("click",()=>{
-    planPO(b.dataset.plan, +b.dataset.qty);
-  }));
-  document.getElementById("syncBtn").addEventListener("click",()=>{BC.lastSync="just now";toast("Synced from Business Central — demand up to date");render();});
+  document.getElementById("syncBtn").addEventListener("click",()=>{BC.lastSync="just now";toast("Synced from Business Central");render();});
 }
-function planPO(part, qty){
+
+/* net requirements: demand − on-hand − open production orders */
+function planRequirements(){
+  const items={};
+  const add=(part,desc,qty,src)=>{items[part]=items[part]||{part,desc,so:0,fc:0,onHand:ON_HAND[part]||0,onOrder:0};items[part][src]+=qty;};
+  BC_SALESORDERS.forEach(o=>o.salesOrderLines.forEach(l=>{const open=l.quantity-l.shippedQuantity;if(open>0)add(l.lineObjectNumber,l.description,open,"so");}));
+  BC_FORECAST.forEach(f=>add(f.itemNumber,f.description,f.quantity,"fc"));
+  state.orders.filter(o=>o.stage!=="finished").forEach(o=>{if(items[o.item])items[o.item].onOrder+=o.qty;});
+  return Object.values(items).map(it=>{const gross=it.so+it.fc;const net=Math.max(0,gross-it.onHand-it.onOrder);return {...it,gross,net,covered:net===0};}).sort((a,b)=>b.net-a.net);
+}
+
+/* ============================================================ 3. PLANNING (BC) — prod orders by BOM */
+function viewPlanning(){
+  canvas.appendChild(el(`<div class="attn" style="margin-bottom:16px"><span class="ai">${ownerBadge("bc")}</span>
+    <div style="margin-left:4px"><b>This mirrors Business Central.</b><p>Production orders are created from <b>production BOMs</b> and move Planned → Firm Planned → Released here. The moment one is <b>Released</b>, Flow picks it up for kitting. (Buttons below simulate the BC status changes.)</p></div></div>`));
+
+  // net requirements → create planned order by BOM
+  const reqs=planRequirements();
+  const planCard=el(`<div class="card" style="margin-bottom:18px"></div>`);
+  planCard.appendChild(el(`<div class="pad" style="border-bottom:1px solid var(--border);display:flex;align-items:flex-end;justify-content:space-between"><div><div class="eyebrow">Planning worksheet</div><h3 class="h2">Net requirements → production order (by BOM)</h3></div><span class="sub">${reqs.filter(r=>r.net>0).length} need action</span></div>`));
+  const ptbl=el(`<table class="tbl"><thead><tr><th>Item</th><th>Prod. BOM</th><th class="right">Sales ord.</th><th class="right">Forecast</th><th class="right">On hand</th><th class="right">On order</th><th class="right">Net</th><th></th></tr></thead><tbody></tbody></table>`);
+  const ptb=ptbl.querySelector("tbody");
+  reqs.forEach(r=>{const fam=familyOf(r.part);const bomNo=FAMILIES[fam].bomNo;
+    ptb.appendChild(el(`<tr><td><b style="font-weight:650">${r.desc}</b><br><span class="tag">${r.part}</span></td>
+      <td><span class="tag">${bomNo}</span></td>
+      <td class="right num">${r.so||"—"}</td><td class="right num muted">${r.fc||"—"}</td><td class="right num">${r.onHand||"—"}</td><td class="right num">${r.onOrder||"—"}</td>
+      <td class="right num" style="font-weight:700;color:${r.net>0?'var(--warn)':'var(--ink)'}">${r.net||0}</td>
+      <td class="right">${r.net>0?`<button class="btn primary sm" data-plan="${r.part}" data-qty="${r.net}">Create order</button>`:'<span class="muted" style="font-size:12px">covered</span>'}</td></tr>`));});
+  planCard.appendChild(el(`<div style="overflow-x:auto"></div>`)).appendChild(ptbl);
+  canvas.appendChild(planCard);
+
+  // production order pipeline board: Planned / Firm Planned / Released
+  const pipe=el(`<div class="card pad"></div>`);
+  pipe.appendChild(el(`<div class="section-head"><div><div class="eyebrow">Production orders in Business Central</div><h3 class="h2">Planned → Firm Planned → Released</h3></div></div>`));
+  const cols=el(`<div class="board" style="grid-template-columns:repeat(3,1fr)"></div>`);
+  [["planned","Planned"],["firmPlanned","Firm Planned"],["released","Released → handoff"]].forEach(([key,label])=>{
+    const items=state.orders.filter(o=>o.stage===key);
+    const col=el(`<div class="col bc"><h4>${label}<span class="cnt">${items.length}</span></h4></div>`);
+    items.forEach(o=>{
+      let action="";
+      if(key==="planned")action=`<button class="btn sm" data-firm="${o.id}" style="width:100%;margin-top:8px">Firm plan ${I.arrow}</button>`;
+      else if(key==="firmPlanned")action=`<button class="btn sm primary" data-release="${o.id}" style="width:100%;margin-top:8px">Release ${I.arrow}</button>`;
+      else action=`<button class="btn sm good" data-tokit="${o.id}" style="width:100%;margin-top:8px">${I.box}Kit now</button>`;
+      const c=el(`<div class="pcard pr-${o.priority}">
+        <div class="pid">${o.id}</div><div class="pname">${o.product}</div>
+        <div class="prow"><span class="qty">${o.qty} ea</span><span>${o.due}</span></div>
+        <div class="row" style="gap:6px;margin-top:8px"><span class="tag" style="font-size:10.5px">${o.bomNo}</span><span class="tag" style="font-size:10.5px">${o.routingNo}</span></div>
+        ${action}</div>`);
+      col.appendChild(c);
+    });
+    if(!items.length)col.appendChild(el(`<div class="sub" style="padding:6px 2px">—</div>`));
+    cols.appendChild(col);
+  });
+  pipe.appendChild(cols);
+  canvas.appendChild(pipe);
+
+  ptb.querySelectorAll("[data-plan]").forEach(b=>b.addEventListener("click",()=>createPlanned(b.dataset.plan,+b.dataset.qty)));
+  cols.querySelectorAll("[data-firm]").forEach(b=>b.addEventListener("click",()=>{const o=byId(b.dataset.firm);o.stage="firmPlanned";toast(`${o.id} firm planned in BC`);render();}));
+  cols.querySelectorAll("[data-release]").forEach(b=>b.addEventListener("click",()=>{const o=byId(b.dataset.release);o.stage="released";toast(`${o.id} released in BC — picked up by Flow`);render();}));
+  cols.querySelectorAll("[data-tokit]").forEach(b=>b.addEventListener("click",()=>{state.selected=b.dataset.tokit;go("kitting");}));
+}
+function byId(id){return state.orders.find(o=>o.id===id);}
+function createPlanned(part,qty){
   const fam=familyOf(part);
-  const o=mkOrder({product:itemName(part), part, qty, family:fam, stage:"routed", priority:"normal",
-    due:"Aug 15", source:"Business Central demand",
-    picks:pickset(genPicks(fam, qty))});
-  state.orders.unshift(o); state.selected=o.id;
-  toast(`${o.id} planned from demand — ${qty} × ${part}`);
-  go("routing");
+  const o=mkOrder({item:part,product:itemName(part),qty,family:fam,stage:"planned",priority:"normal",due:"Aug 15",source:"planning"});
+  state.orders.unshift(o);
+  toast(`Planned order ${o.id} created from ${o.bomNo}`);
+  render();
 }
 
-/* ============================================================ 2. CREATE ORDER (live feasibility) */
-const CATALOG=[
-  {part:"FRM-1200-A",name:"Conveyor Drive Frame — 1200mm",family:"frame",lead:5},
-  {part:"FRM-900-A",name:"Conveyor Drive Frame — 900mm",family:"frame",lead:4},
-  {part:"PNL-GC-04",name:"Guard Panel Set — Type C",family:"panel",lead:3},
-  {part:"PNL-GA-01",name:"Guard Panel Set — Type A",family:"panel",lead:3},
-  {part:"SHF-45-H",name:"Output Shaft 45mm — Hardened",family:"shaft",lead:4},
-  {part:"SHF-60",name:"Output Shaft 60mm",family:"shaft",lead:4},
-];
-const draft={part:"FRM-1200-A",qty:24,due:"2026-07-30",priority:"normal"};
-function viewCreate(){
-  canvas.appendChild(el(`<div class="section-head"><div><div class="eyebrow">Step 1 · Draft</div><h2 class="h2">Create a production order</h2><p class="sub">Enter what and how many. Feasibility updates as you type — no blind order entry.</p></div></div>`));
-  const split=el(`<div class="split"></div>`);
-  // form
-  const form=el(`<div class="card pad"></div>`);
-  const catOpts=CATALOG.map(c=>`<option value="${c.part}" ${c.part===draft.part?"selected":""}>${c.part} · ${c.name}</option>`).join("");
-  form.appendChild(el(`
-    <div class="field"><label>Product</label><select id="f_part">${catOpts}</select></div>
-    <div class="grid" style="grid-template-columns:1fr 1fr">
-      <div class="field"><label>Quantity</label><input class="mono" id="f_qty" type="number" min="1" value="${draft.qty}"></div>
-      <div class="field"><label>Priority</label><select id="f_pri">
-        <option value="normal">Normal</option><option value="high">High</option><option value="hot">Hot</option></select></div>
-    </div>
-    <div class="field"><label>Need-by date</label><input class="mono" id="f_due" type="date" value="${draft.due}"></div>
-    <div class="hr"></div>
-    <div id="feasBox"></div>
-    <div class="row" style="margin-top:16px">
-      <button class="btn primary" id="createBtn" style="flex:1">Create &amp; route order ${I.arrow}</button>
-      <button class="btn" id="createRoute">Create as draft</button>
-    </div>
-  `));
-  split.appendChild(form);
-  // live panel
-  const live=el(`<div id="livePanel"></div>`);
-  split.appendChild(live);
-  canvas.appendChild(split);
-
-  const read=()=>({part:document.getElementById("f_part").value,qty:+document.getElementById("f_qty").value||0,
-    pri:document.getElementById("f_pri").value,due:document.getElementById("f_due").value});
-  function refresh(){
-    const d=read(); Object.assign(draft,{part:d.part,qty:d.qty,priority:d.pri,due:d.due});
-    const cat=CATALOG.find(c=>c.part===d.part);
-    // synthetic feasibility
-    const matOk = d.qty<=48; const matShort= d.qty>48;
-    const ops=routingFor(cat.family);
-    const totalHrs=ops.reduce((a,o)=>a+o.setup+o.runEa*d.qty,0);
-    const bottleneck=ops.reduce((m,o)=> (o.runEa*d.qty)>(m.h)?{wc:o.wc,h:o.runEa*d.qty}:m,{wc:"",h:0});
-    const bwc=WORKCENTERS.find(w=>w.id===bottleneck.wc);
-    const loadPct=Math.round((CAPACITY.find(c=>c.wc.id===bottleneck.wc).load[3]+bottleneck.h)/bwc.cap*100);
-    const feasHtml=`
-      <div class="feasibility">
-        <div class="eyebrow" style="margin-bottom:6px">Live feasibility</div>
-        ${feasRow(matOk?"ok":"warn", matOk?"Materials available":"Partial shortage",
-          matOk?"All 6 component lines in stock for this quantity.":"Some components short at this quantity — pick will flag backorders.", I.box)}
-        ${feasRow(loadPct>100?"warn":"ok", loadPct>100?`${bwc.name} runs hot`:"Capacity fits",
-          loadPct>100?`Adds ${bottleneck.h.toFixed(1)}h to ${bwc.name} — ${loadPct}% of day. Consider splitting or later start.`:`Fits within ${bwc.name} and 5 other work centers. ~${totalHrs.toFixed(0)}h total.`, I.factory)}
-        ${feasRow("ok","Standard routing ready",`${ops.length} operations auto-generated from the ${cat.family} template.`, I.route)}
-      </div>`;
-    document.getElementById("feasBox").innerHTML=feasHtml;
-
-    // live panel: suggested schedule + routing preview
-    const start=new Date(d.due); start.setDate(start.getDate()-cat.lead-2);
-    const startStr=start.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
-    live.innerHTML=`
-      <div class="card pad" style="margin-bottom:16px">
-        <div class="eyebrow">Suggested schedule</div>
-        <div class="row" style="margin-top:12px;gap:14px;align-items:stretch">
-          <div style="flex:1;text-align:center;padding:12px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px">
-            <div class="eyebrow">Start</div><div class="num" style="font-size:18px;font-weight:700;margin-top:4px">${startStr}</div></div>
-          <div style="display:grid;place-items:center;color:var(--ink-3)">${I.arrow}</div>
-          <div style="flex:1;text-align:center;padding:12px;background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:10px">
-            <div class="eyebrow" style="color:var(--accent-ink)">Finish</div><div class="num" style="font-size:18px;font-weight:700;margin-top:4px;color:var(--accent-ink)">${new Date(d.due).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}</div></div>
-        </div>
-        <p class="sub" style="margin-top:12px">Backward-scheduled from need-by using ${cat.lead}-day lead + 2-day buffer. Finite capacity respected.</p>
-      </div>
-      <div class="card pad">
-        <div class="eyebrow" style="margin-bottom:10px">Routing preview · ${ops.length} ops</div>
-        ${ops.map((o,i)=>{const wc=WORKCENTERS.find(w=>w.id===o.wc);return`<div class="row" style="padding:7px 0;border-bottom:${i<ops.length-1?'1px solid var(--border)':'0'}">
-          <span class="seq" style="width:24px;height:24px;font-size:11px">${(i+1)*10}</span>
-          <span style="flex:1;font-size:13px;font-weight:600">${o.name}</span>
-          <span class="tag">${wc.name}</span>
-          <span class="num muted" style="font-size:12px;width:52px;text-align:right">${(o.setup+o.runEa*d.qty).toFixed(1)}h</span>
-        </div>`;}).join("")}
-      </div>`;
-  }
-  ["f_part","f_qty","f_pri","f_due"].forEach(id=>document.getElementById(id).addEventListener("input",refresh));
-  document.getElementById("createBtn").addEventListener("click",()=>doCreate(true));
-  document.getElementById("createRoute").addEventListener("click",()=>doCreate(false));
-  refresh();
-}
-function feasRow(state,title,desc,icon){
-  const map={ok:["good",I.checkc],warn:["warn",I.alert],no:["crit",I.x]};
-  const m=map[state];
-  return `<div class="feas-row"><span class="fi" style="background:var(--${m[0]}-soft);color:var(--${m[0]})">${m[1]}</span>
-    <div class="fm"><b>${title}</b><p>${desc}</p></div></div>`;
-}
-function doCreate(route){
-  const cat=CATALOG.find(c=>c.part===draft.part);
-  const o=mkOrder({product:cat.name,part:cat.part,qty:draft.qty,family:cat.family,
-    stage:route?"routed":"draft",priority:draft.priority,due:new Date(draft.due).toLocaleDateString(undefined,{month:"short",day:"numeric"}),
-    picks:pickset(genPicks(cat.family,draft.qty))});
-  state.orders.unshift(o); state.selected=o.id;
-  toast(`${o.id} created${route?" and routed":" as draft"}`);
-  go(route?"routing":"command");
-}
-function genPicks(family,qty){
-  const base={
-    frame:[["STL-CH-3x2","Steel channel 3×2",4],["PLT-6MM","6mm plate",0.25],["WELD-ER70","ER70 wire spool",0.17],["PWD-RAL7016","Powder RAL7016",0.09],["BRG-6208","Bearing 6208-2RS",2],["FAS-M10","M10 hardware kit",1]],
-    panel:[["SHT-2MM","2mm sheet",0.5],["HNG-SS","Stainless hinge",2],["PWD-RAL9005","Powder RAL9005",0.05],["FAS-M6","M6 hardware kit",1]],
-    shaft:[["BAR-45-4140","4140 bar 3m",0.35],["BRG-6209","Bearing 6209-2RS",2],["KEY-12","12mm key stock",1]],
-  }[family];
-  return base.map(b=>{const need=Math.ceil(b[2]*qty);const avail=Math.random()<0.85?need:Math.floor(need*0.6);return [b[0],b[1],need,avail];});
-}
-
-/* ============================================================ 3. ROUTING */
-function viewRouting(){
-  canvas.appendChild(el(orderPicker())); wireOrderPicker();
+/* ============================================================ 4. KITTING (production BOM) */
+function viewKitting(){
+  const pick=orderPicker(["released","kitting"]);
+  canvas.appendChild(el(pick.html)); wireOrderPicker();
+  if(!pick.list.length){canvas.appendChild(el(`<div class="card pad muted">No orders released from Business Central yet. Release one in Planning.</div>`));return;}
   const o=selOrder();
   canvas.appendChild(el(`<div style="margin-bottom:16px">${stepper(o)}</div>`));
-  const advance = stageIndex(o.stage) < stageIndex("picking")
-    ? `<button class="btn primary" id="advBtn">Send to picking ${I.arrow}</button>` : "";
-  canvas.appendChild(el(orderHeader(o, advance)));
 
-  const split=el(`<div class="split"></div>`);
-  const left=el(`<div class="card pad"></div>`);
-  left.appendChild(el(`<div class="section-head"><div><div class="eyebrow">Operations</div><h3 class="h2">Routing</h3></div>
-    <button class="btn sm" id="addOp">${I.plus}Add operation</button></div>`));
-  let cum=0;
-  o.routing.forEach((op,i)=>{
-    const wc=WORKCENTERS.find(w=>w.id===op.wc);
-    const opHrs=op.setup+op.runEa*o.qty; cum+=opHrs;
-    const row=el(`<div class="op" data-i="${i}" draggable="true">
-      <span class="drag" title="Drag to reorder">${I.drag}</span>
-      <span class="seq">${op.seq}</span>
-      <div class="opmain">
-        <b>${op.name}</b>
-        <div class="opsub">
-          <span>${I.factory}${wc.name} · ${wc.id}</span>
-          <span>${I.clock}Setup ${op.setup}h · ${op.runEa}h/ea</span>
-        </div>
-      </div>
-      <div class="optime">${opHrs.toFixed(1)}h<small>cum ${cum.toFixed(1)}h</small></div>
-    </div>`);
-    left.appendChild(row);
-  });
-  enableDrag(left,o);
-  split.appendChild(left);
+  const allKitted=o.bom.every(p=>p.picked>=Math.min(p.need,p.avail));
+  const advance=allKitted
+    ? `<button class="btn good" id="issueBtn">${I.checkc}Complete kit &amp; issue to floor</button>`
+    : `<button class="btn primary" id="kitAll">Kit all available</button>`;
+  canvas.appendChild(el(orderHeader(o,advance)));
 
-  // right: capacity impact of this routing
-  const right=el(`<div></div>`);
-  const totalHrs=o.routing.reduce((a,op)=>a+op.setup+op.runEa*o.qty,0);
-  right.appendChild(el(`<div class="card pad" style="margin-bottom:16px">
-    <div class="eyebrow">Routing summary</div>
-    <div class="row" style="margin-top:12px;justify-content:space-between"><span class="sub">Operations</span><b class="num">${o.routing.length}</b></div>
-    <div class="row" style="margin-top:8px;justify-content:space-between"><span class="sub">Work centers</span><b class="num">${new Set(o.routing.map(r=>r.wc)).size}</b></div>
-    <div class="row" style="margin-top:8px;justify-content:space-between"><span class="sub">Total std hours</span><b class="num">${totalHrs.toFixed(1)}h</b></div>
-    <div class="row" style="margin-top:8px;justify-content:space-between"><span class="sub">Std hrs / unit</span><b class="num">${(totalHrs/o.qty).toFixed(2)}h</b></div>
-  </div>`));
-  const impact=el(`<div class="card pad"></div>`);
-  impact.appendChild(el(`<div class="eyebrow" style="margin-bottom:6px">Load this order adds</div>`));
-  const byWc={};
-  o.routing.forEach(op=>{byWc[op.wc]=(byWc[op.wc]||0)+op.setup+op.runEa*o.qty;});
-  Object.entries(byWc).forEach(([wcid,hrs])=>{
-    const wc=WORKCENTERS.find(w=>w.id===wcid);
-    const base=CAPACITY.find(c=>c.wc.id===wcid).load[3];
-    const pct=Math.round((base+hrs)/wc.cap*100);
-    const over=pct>100;
-    impact.appendChild(el(`<div class="loadbar">
-      <span class="lbl">${wc.name}</span>
-      <span class="track"><span class="fill" style="width:${Math.min(pct,100)}%;background:${over?'var(--crit)':pct>85?'var(--warn)':'var(--accent)'}"></span><span class="capline"></span></span>
-      <span class="pct" style="color:${over?'var(--crit)':'var(--ink-2)'}">+${hrs.toFixed(1)}h</span>
-    </div>`));
-  });
-  right.appendChild(impact);
-  split.appendChild(right);
-  canvas.appendChild(split);
-
-  const adv=document.getElementById("advBtn");
-  if(adv)adv.addEventListener("click",()=>{o.stage="picking";toast(`${o.id} sent to picking`);go("pick");});
-  document.getElementById("addOp").addEventListener("click",()=>toast("Operation editor — prototype stub"));
-}
-function enableDrag(container,o){
-  let dragEl=null;
-  container.querySelectorAll(".op").forEach(row=>{
-    row.addEventListener("dragstart",e=>{dragEl=row;row.style.opacity=".4";});
-    row.addEventListener("dragend",()=>{if(dragEl)dragEl.style.opacity="";dragEl=null;});
-    row.addEventListener("dragover",e=>{e.preventDefault();
-      const rect=row.getBoundingClientRect();const after=e.clientY>rect.top+rect.height/2;
-      if(dragEl&&dragEl!==row){row.parentNode.insertBefore(dragEl,after?row.nextSibling:row);}});
-  });
-  container.addEventListener("drop",e=>{e.preventDefault();
-    const order=[...container.querySelectorAll(".op")].map(r=>o.routing[+r.dataset.i]);
-    o.routing=order.map((op,i)=>({...op,seq:(i+1)*10}));
-    toast("Routing reordered");render();});
-}
-
-/* ============================================================ 4. PICK & ISSUE */
-function viewPick(){
-  canvas.appendChild(el(orderPicker())); wireOrderPicker();
-  const o=selOrder();
-  if(!o.picks.length){canvas.appendChild(el(`<div class="card pad muted">No pick list yet — route this order first.</div>`));return;}
-  canvas.appendChild(el(`<div style="margin-bottom:16px">${stepper(o)}</div>`));
-
-  const allPicked=o.picks.every(p=>p.picked>=Math.min(p.need,p.avail));
-  const anyShort=shortCount(o)>0;
-  const advance = allPicked
-    ? `<button class="btn primary" id="advBtn">To sign-off ${I.arrow}</button>`
-    : `<button class="btn primary" id="pickAll">Confirm all available</button>`;
-  canvas.appendChild(el(orderHeader(o, advance)));
-
-  if(anyShort)canvas.appendChild(el(`<div class="attn warn" style="margin-bottom:16px"><span class="ai">${I.alert}</span><div><b>${shortCount(o)} line(s) short</b><p>You can pick what's available and backorder the rest, or substitute. Short lines won't block the others.</p></div></div>`));
+  if(shortCount(o))canvas.appendChild(el(`<div class="attn warn" style="margin-bottom:16px"><span class="ai">${I.alert}</span><div><b>${shortCount(o)} BOM line(s) short</b><p>Kit what's on hand and backorder the rest — short lines won't block the others. Consumption for what you kit posts back to Business Central.</p></div></div>`));
 
   const card=el(`<div class="card"></div>`);
-  card.appendChild(el(`<div class="pad" style="border-bottom:1px solid var(--border)"><div class="eyebrow">Pick list</div><span class="sub">Bin locations sequenced for a single-pass walk</span></div>`));
-  const tbl=el(`<table class="tbl"><thead><tr>
-    <th>Component</th><th>Bin</th><th class="right">Need</th><th class="right">Avail</th><th class="right">Picked</th><th>Status</th><th></th>
-  </tr></thead><tbody></tbody></table>`);
+  card.appendChild(el(`<div class="pad" style="border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+    <div><div class="eyebrow">Production BOM · ${o.bomNo}</div><span class="sub">Components from Business Central · bin-sequenced</span></div>
+    <span class="pill accent">${o.bom.length} lines</span></div>`));
+  const tbl=el(`<table class="tbl"><thead><tr><th>Component</th><th>Bin</th><th class="right">Per unit</th><th class="right">Required</th><th class="right">Avail</th><th class="right">Kitted</th><th>Status</th><th></th></tr></thead><tbody></tbody></table>`);
   const tb=tbl.querySelector("tbody");
-  o.picks.forEach((p,i)=>{
-    const short=p.avail<p.need; const done=p.picked>=Math.min(p.need,p.avail);
-    const tr=el(`<tr>
-      <td><b style="font-weight:650">${p.name}</b><br><span class="tag">${p.part}</span></td>
+  o.bom.forEach((p,i)=>{const short=p.avail<p.need;const done=p.picked>=Math.min(p.need,p.avail);
+    tb.appendChild(el(`<tr><td><b style="font-weight:650">${p.name}</b><br><span class="tag">${p.part}</span></td>
       <td><span class="mono" style="font-weight:600">${p.bin}</span></td>
+      <td class="right num muted">${p.per}</td>
       <td class="right num">${p.need}</td>
       <td class="right num" style="color:${short?'var(--crit)':'var(--ink)'}">${p.avail}</td>
       <td class="right num" style="font-weight:700">${p.picked}</td>
-      <td>${done?'<span class="pill good"><span class="dot"></span>Picked</span>':short?'<span class="pill warn"><span class="dot"></span>Short</span>':'<span class="pill neutral">Pending</span>'}</td>
-      <td class="right">${done?"":`<button class="btn sm" data-pick="${i}">Pick ${Math.min(p.need,p.avail)}</button>`}</td>
-    </tr>`);
-    tb.appendChild(tr);
-  });
+      <td>${done?'<span class="pill good"><span class="dot"></span>Kitted</span>':short?'<span class="pill warn"><span class="dot"></span>Short</span>':'<span class="pill neutral">Pending</span>'}</td>
+      <td class="right">${done?"":`<button class="btn sm" data-kit="${i}">Kit ${Math.min(p.need,p.avail)}</button>`}</td></tr>`));});
   card.appendChild(el(`<div style="overflow-x:auto"></div>`)).appendChild(tbl);
   canvas.appendChild(card);
 
-  tb.querySelectorAll("[data-pick]").forEach(b=>b.addEventListener("click",()=>{
-    const p=o.picks[+b.dataset.pick]; p.picked=Math.min(p.need,p.avail);
-    toast(`Picked ${p.picked} × ${p.part}`); render();
-  }));
-  const pa=document.getElementById("pickAll");
-  if(pa)pa.addEventListener("click",()=>{o.picks.forEach(p=>p.picked=Math.min(p.need,p.avail));toast("Confirmed all available lines");render();});
-  const adv=document.getElementById("advBtn");
-  if(adv)adv.addEventListener("click",()=>{o.stage="released";toast(`${o.id} staged — ready for sign-off`);go("release");});
+  tb.querySelectorAll("[data-kit]").forEach(b=>b.addEventListener("click",()=>{const p=o.bom[+b.dataset.kit];p.picked=Math.min(p.need,p.avail);if(o.stage==="released")o.stage="kitting";toast(`Kitted ${p.picked} × ${p.part}`);render();}));
+  const ka=document.getElementById("kitAll");
+  if(ka)ka.addEventListener("click",()=>{o.bom.forEach(p=>p.picked=Math.min(p.need,p.avail));o.stage="kitting";toast("Kitted all available lines");render();});
+  const ib=document.getElementById("issueBtn");
+  if(ib)ib.addEventListener("click",()=>{o.stage="production";o.routing[0].status="active";state.timer={running:false,seconds:0,order:o.id};wbPost(o,"Consumption journal",`Kitted ${o.bom.length} BOM lines · ${o.bomNo}`);go("floor");});
 }
 
-/* ============================================================ 5. SIGN-OFF / RELEASE */
-function viewRelease(){
-  canvas.appendChild(el(orderPicker())); wireOrderPicker();
-  const o=selOrder();
-  canvas.appendChild(el(`<div style="margin-bottom:16px">${stepper(o)}</div>`));
-
-  const checks=[
-    {ok:o.routing.length>0, t:"Routing complete", d:`${o.routing.length} operations across ${new Set(o.routing.map(r=>r.wc)).size} work centers.`},
-    {ok:pickProgress(o)>=100||o.picks.every(p=>p.picked>=Math.min(p.need,p.avail))&&o.picks.length>0, wait:shortCount(o)>0, t:"Materials staged", d: shortCount(o)>0?`${shortCount(o)} line(s) backordered — released to floor with partial kit.`:"All components picked to the line."},
-    {ok:true, t:"Work instructions attached", d:"Rev C drawing + weld map linked to operations 30–40."},
-    {ok:true, t:"Capacity confirmed", d:"Finite schedule holds the need-by date."},
-    {ok:o.priority!=="hot"?true:true, t:"Quality plan", d:"Final QA operation present with CMM inspection."},
-  ];
-  const allGo=checks.every(c=>c.ok||c.wait);
-
-  const split=el(`<div class="split"></div>`);
-  const left=el(`<div class="card pad"></div>`);
-  left.appendChild(el(`<div class="eyebrow">Readiness gate</div><h3 class="h2" style="margin:2px 0 8px">Everything green before it hits the floor</h3>`));
-  checks.forEach(c=>{
-    const cls=c.ok?"ok":c.wait?"wait":"no"; const ic=c.ok?I.checkc:c.wait?I.alert:I.x;
-    left.appendChild(el(`<div class="check"><span class="ck ${cls}">${ic}</span><div class="cmain"><b>${c.t}</b><p>${c.d}</p></div></div>`));
-  });
-  split.appendChild(left);
-
-  const right=el(`<div class="card pad" style="position:sticky;top:78px"></div>`);
-  const released = stageIndex(o.stage)>=stageIndex("released");
-  right.innerHTML=`
-    <div class="eyebrow">Digital sign-off</div>
-    <div style="margin-top:14px;padding:16px;border:1px solid var(--border);border-radius:11px;background:var(--surface-2);text-align:center">
-      <div style="width:52px;height:52px;border-radius:14px;margin:0 auto 10px;display:grid;place-items:center;background:var(--${allGo?'good':'warn'}-soft);color:var(--${allGo?'good':'warn'})">${allGo?I.shield:I.alert}</div>
-      <b style="font-size:15px">${allGo?"Ready to release":"Blocked"}</b>
-      <p class="sub" style="margin-top:4px">${allGo?"All gate items satisfied. Your sign-off releases the job.":"Resolve the flagged items first."}</p>
-    </div>
-    <div class="field" style="margin-top:16px"><label>Released by</label><input value="J. Wilson · Production Lead" readonly style="background:var(--surface-3)"></div>
-    <button class="btn ${released?'':'good'}" id="releaseBtn" style="width:100%" ${released?'disabled':''}>${released?'Released ✓':'Sign &amp; release to floor'}</button>
-    ${released?`<p class="sub" style="text-align:center;margin-top:10px">Released ${new Date().toLocaleDateString(undefined,{month:"short",day:"numeric"})} · now on the floor</p>`:""}`;
-  split.appendChild(right);
-  canvas.appendChild(orderHeaderNode(o));
-  canvas.appendChild(split);
-
-  const rb=document.getElementById("releaseBtn");
-  if(rb&&!released)rb.addEventListener("click",()=>{o.stage="production";o.activeOp=0;o.routing.forEach(r=>r.status="pending");if(o.routing[0])o.routing[0].status="active";state.timer.order=o.id;toast(`${o.id} released to the floor`);go("floor");});
-}
-function orderHeaderNode(o){const d=el("<div></div>");d.innerHTML=orderHeader(o,"");d.style.marginBottom="0";return d.firstElementChild;}
-
-/* ============================================================ 6. FLOOR TERMINAL */
+/* ============================================================ 5. FLOOR TERMINAL — routing + sign-off + labor + write-back */
 let timerHandle=null;
 function viewFloor(){
   const running=state.orders.filter(o=>o.stage==="production");
-  canvas.appendChild(el(`<div class="row" style="margin-bottom:16px;justify-content:space-between">
-    <div><div class="eyebrow">Floor terminal</div><h2 class="h2">On the floor now</h2></div>
-    <div class="wrap" id="floorTabs"></div></div>`));
+  canvas.appendChild(el(`<div class="row" style="margin-bottom:16px;justify-content:space-between;flex-wrap:wrap;gap:10px">
+    <div><div class="eyebrow">Floor terminal</div><h2 class="h2">On the floor now</h2></div><div class="wrap" id="floorTabs"></div></div>`));
   const tabs=document.getElementById("floorTabs");
-  running.forEach(o=>{
-    const b=el(`<button class="btn sm ${o.id===state.selected?'primary':''}">${o.id} · ${o.part}</button>`);
-    b.addEventListener("click",()=>{state.selected=o.id;render();});
-    tabs.appendChild(b);
-  });
+  running.forEach(o=>{const b=el(`<button class="btn sm ${o.id===state.selected?'primary':''}">${o.id} · ${o.item}</button>`);b.addEventListener("click",()=>{state.selected=o.id;render();});tabs.appendChild(b);});
   let o=selOrder();
   if(!o||o.stage!=="production"){o=running[0];if(o)state.selected=o.id;}
-  if(!o){canvas.appendChild(el(`<div class="card pad muted">No orders on the floor. Release one from sign-off.</div>`));return;}
+  if(!o){canvas.appendChild(el(`<div class="card pad muted">No orders on the floor. Issue a kitted order from Kitting.</div>`));return;}
 
   canvas.appendChild(el(`<div style="margin-bottom:16px">${stepper(o)}</div>`));
 
-  const activeIdx=o.routing.findIndex(r=>r.status==="active");
-  const cur=activeIdx>=0?activeIdx:o.routing.findIndex(r=>r.status!=="done");
-  const grid=el(`<div class="floor-grid"></div>`);
+  const cur=o.routing.findIndex(r=>r.status==="active");
+  const nextIdx=o.routing.findIndex(r=>r.status==="pending");
 
+  const split=el(`<div class="split"></div>`);
+  const travel=el(`<div></div>`);
   o.routing.forEach((op,i)=>{
     const wc=WORKCENTERS.find(w=>w.id===op.wc);
-    const isActive=i===cur && o.routing.some(r=>r.status==="active");
-    const isDone=op.status==="done";
-    const isNext=i===cur && !isActive;
-    const pctDone=isDone?100:isActive?Math.round(o.good/o.qty*100):0;
-    const card=el(`<div class="opcard ${isActive?'active':''}">
-      <div class="oc-head">
-        <div class="row"><span class="seq">${op.seq}</span><div><b style="font-size:13.5px">${op.name}</b><br><span class="tag" style="font-size:11px">${wc.name}</span></div></div>
-        ${isDone?'<span class="pill good"><span class="dot"></span>Done</span>':isActive?'<span class="pill accent"><span class="dot"></span>Running</span>':'<span class="pill neutral">Queued</span>'}
-      </div>
+    const isActive=op.status==="active";const isDone=op.status==="done";
+    const isNext=i===nextIdx&&cur<0;
+    const card=el(`<div class="opcard ${isActive?'active':''}" style="margin-bottom:12px">
+      <div class="oc-head"><div class="row"><span class="seq">${op.seq}</span><div><b style="font-size:13.5px">${op.name}</b><br><span class="tag" style="font-size:11px">${wc.name}</span></div></div>
+      ${isDone?'<span class="pill good"><span class="dot"></span>Signed off</span>':isActive?'<span class="pill accent"><span class="dot"></span>Running</span>':'<span class="pill neutral">Queued</span>'}</div>
       <div class="oc-body"></div></div>`);
     const body=card.querySelector(".oc-body");
     if(isActive){
-      body.appendChild(el(`<div class="row" style="justify-content:space-between;align-items:center">
-        <div><div class="eyebrow">Run time</div><div class="timer" id="floorTimer">${fmtTime(state.timer.seconds)}</div></div>
-        ${ring(o.good/o.qty)}
-      </div>`));
-      body.appendChild(el(`<div class="qtybox">
-        <div class="qb good"><div class="qv" id="qGood">${o.good}</div><div class="ql">Good</div></div>
-        <div class="qb scrap"><div class="qv" id="qScrap">${o.scrap}</div><div class="ql">Scrap</div></div>
-      </div>`));
+      body.appendChild(el(`<div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+        <div><div class="eyebrow">Run time</div><div class="timer" id="floorTimer">${fmtTime(state.timer.order===o.id?state.timer.seconds:0)}</div></div>
+        <div style="text-align:right"><div class="eyebrow">Operator</div>
+          <select class="assignsel" id="opOperator" style="margin-top:4px">${OPERATORS.map(n=>`<option ${n===op.operator?"selected":""}>${n}</option>`).join("")}</select></div></div>`));
+      body.appendChild(el(`<div class="qtybox"><div class="qb good"><div class="qv" id="qGood">${o.good}</div><div class="ql">Good</div></div><div class="qb scrap"><div class="qv" id="qScrap">${o.scrap}</div><div class="ql">Scrap</div></div></div>`));
       body.appendChild(el(`<div class="stepbtns"><button class="btn sm" id="repGood">+ Good</button><button class="btn sm" id="repScrap">+ Scrap</button></div>`));
-      body.appendChild(el(`<div class="stepbtns" style="margin-top:10px">
-        <button class="btn ${state.timer.running?'':'primary'}" id="toggleRun">${state.timer.running?I.pause+'Pause':I.play+'Start'}</button>
-        <button class="btn good" id="completeOp">${I.checkc}Complete op</button></div>`));
+      body.appendChild(el(`<div class="stepbtns" style="margin-top:10px"><button class="btn ${state.timer.running?'':'primary'}" id="toggleRun">${state.timer.running?I.pause+'Pause':I.play+'Start'}</button><button class="btn good" id="completeOp">${I.pen}Sign off &amp; complete</button></div>`));
+      body.appendChild(el(`<p class="sub" style="margin-top:10px;font-size:11.5px">Completing posts an <b>output journal</b> (qty + run time) to Business Central against this operation.</p>`));
     } else if(isDone){
-      body.appendChild(el(`<div class="row" style="justify-content:space-between"><span class="sub">Reported good</span><b class="num">${op._good??o.qty}</b></div>
-        <div class="row" style="justify-content:space-between;margin-top:6px"><span class="sub">Cycle</span><b class="num">${op._cycle||((op.setup+op.runEa*o.qty).toFixed(1)+'h')}</b></div>
-        <div class="mini-prog" style="margin-top:12px"><i style="width:100%;background:var(--good)"></i></div>`));
+      body.appendChild(el(`<div class="row" style="justify-content:space-between"><span class="sub">Qty output</span><b class="num">${op.qtyOut}</b></div>
+        <div class="row" style="justify-content:space-between;margin-top:6px"><span class="sub">Labor</span><b class="num">${(op.laborMin/60).toFixed(1)}h</b></div>
+        <div class="op-signed" style="margin-top:10px">${I.checkc}Signed off by ${op.signedBy}${op.wc==="WC-QA"?" (QA)":""} · ${op.signedAt}</div>`));
     } else {
       body.appendChild(el(`<div class="sub">Queued at ${wc.name}.</div>
         <div class="row" style="justify-content:space-between;margin-top:10px"><span class="sub">Std time</span><b class="num">${(op.setup+op.runEa*o.qty).toFixed(1)}h</b></div>
         ${isNext?`<button class="btn sm primary" id="startNext" style="width:100%;margin-top:12px">${I.play}Start operation</button>`:""}`));
     }
-    grid.appendChild(card);
+    travel.appendChild(card);
   });
-  canvas.appendChild(grid);
+  split.appendChild(travel);
+
+  // right column: labor log + write-back
+  const right=el(`<div></div>`);
+  const labor=el(`<div class="card pad" style="margin-bottom:16px"></div>`);
+  labor.appendChild(el(`<div class="eyebrow" style="margin-bottom:8px">${I.user} Labor by operator</div>`));
+  const logged=o.routing.filter(r=>r.laborMin>0);
+  if(logged.length){logged.forEach(r=>labor.appendChild(el(`<div class="laborrow"><span class="seq">${r.seq}</span><div style="flex:1"><b style="font-size:12.5px;font-weight:650">${r.operator||"—"}</b><br><span class="muted" style="font-size:11.5px">${r.name}</span></div><b class="num">${(r.laborMin/60).toFixed(1)}h</b></div>`)));
+    labor.appendChild(el(`<div class="row" style="justify-content:space-between;padding-top:10px;margin-top:2px;border-top:1px solid var(--border-strong)"><b style="font-size:12.5px">Total booked</b><b class="num">${laborHrs(o).toFixed(1)}h</b></div>`));}
+  else labor.appendChild(el(`<div class="sub">No labor booked yet.</div>`));
+  right.appendChild(labor);
+
+  const wb=el(`<div class="card pad"></div>`);
+  wb.appendChild(el(`<div class="eyebrow" style="margin-bottom:8px">${I.sync} Posted to Business Central</div>`));
+  if(o.writeback.length)o.writeback.forEach(w=>wb.appendChild(el(`<div class="wb"><span class="wbi">${I.checkc}</span><div class="wbm"><b>${w.type}</b><br><span class="muted" style="font-size:12px">${w.detail}</span> <span class="wbt">${w.ts}</span></div></div>`)));
+  else wb.appendChild(el(`<div class="sub">Nothing posted yet.</div>`));
+  right.appendChild(wb);
+  split.appendChild(right);
+  canvas.appendChild(split);
 
   // wire
   const tr=document.getElementById("toggleRun");
   if(tr)tr.addEventListener("click",()=>{state.timer.running=!state.timer.running;state.timer.order=o.id;tickSetup();render();});
   const rg=document.getElementById("repGood");
-  if(rg)rg.addEventListener("click",()=>{if(o.good<o.qty){o.good++;document.getElementById("qGood").textContent=o.good;updateRing(o);}else toast("Order quantity reached");});
+  if(rg)rg.addEventListener("click",()=>{if(o.good<o.qty){o.good++;document.getElementById("qGood").textContent=o.good;}else toast("Order quantity reached");});
   const rs=document.getElementById("repScrap");
   if(rs)rs.addEventListener("click",()=>{o.scrap++;document.getElementById("qScrap").textContent=o.scrap;toast("Scrap logged");});
   const co=document.getElementById("completeOp");
   if(co)co.addEventListener("click",()=>completeOp(o,cur));
   const sn=document.getElementById("startNext");
-  if(sn)sn.addEventListener("click",()=>{o.routing[cur].status="active";state.timer.running=true;state.timer.seconds=0;tickSetup();render();});
+  if(sn)sn.addEventListener("click",()=>{o.routing[nextIdx].status="active";state.timer={running:true,seconds:0,order:o.id};tickSetup();render();});
   tickSetup();
 }
 function completeOp(o,i){
-  o.routing[i].status="done"; o.routing[i]._good=o.good; o.routing[i]._cycle=fmtTime(state.timer.seconds);
-  state.timer.running=false;
-  const next=o.routing.findIndex(r=>r.status!=="done");
-  if(next>=0){o.routing[next].status="active";state.timer.seconds=0;toast(`Op complete — advancing to ${o.routing[next].name}`);}
-  else{o.stage="complete";toast(`${o.id} complete — ${o.good} good, ${o.scrap} scrap`);go("command");return;}
+  const op=o.routing[i];const wc=op.wc;
+  op.operator=document.getElementById("opOperator")?document.getElementById("opOperator").value:op.operator||OPERATORS[0];
+  op.status="done";
+  op.laborMin=Math.max(1,Math.round(state.timer.seconds/60))||Math.round((op.setup+op.runEa*o.qty)*60);
+  op.qtyOut=o.good||o.qty;
+  op.signedBy=wc==="WC-QA"?QA_INSPECTOR:op.operator;
+  op.signedAt=new Date().toLocaleDateString(undefined,{month:"short",day:"numeric"});
+  wbPost(o,"Output journal",`Op ${op.seq} · ${op.qtyOut} ea · ${(op.laborMin/60).toFixed(1)}h — ${op.operator}`);
+  state.timer={running:false,seconds:0,order:o.id};
+  const next=o.routing.findIndex(r=>r.status==="pending");
+  if(next>=0){o.routing[next].status="active";toast(`Signed off — advancing to ${o.routing[next].name}`);}
+  else{o.stage="finished";wbPost(o,"Status → Finished",`Production order closed · ${o.good||o.qty} good, ${o.scrap} scrap`);toast(`${o.id} finished — posted to Business Central`);go("command");return;}
   render();
 }
-function ring(frac){
-  const r=26,c=2*Math.PI*r,off=c*(1-Math.min(frac,1));
-  return `<svg width="64" height="64" class="ring" viewBox="0 0 64 64"><circle class="track" cx="32" cy="32" r="${r}"/><circle class="prog" id="floorRing" cx="32" cy="32" r="${r}" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/></svg>`;
-}
-function updateRing(o){const ring=document.getElementById("floorRing");if(!ring)return;const r=26,c=2*Math.PI*r;ring.style.strokeDashoffset=(c*(1-Math.min(o.good/o.qty,1))).toFixed(1);}
-function fmtTime(s){const h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;}
 function tickSetup(){
   if(timerHandle)clearInterval(timerHandle);
-  if(state.timer.running){
-    timerHandle=setInterval(()=>{
-      state.timer.seconds++;
-      const t=document.getElementById("floorTimer");
-      if(t)t.textContent=fmtTime(state.timer.seconds);
-      else{clearInterval(timerHandle);}
-    },1000);
-  }
+  if(state.timer.running){timerHandle=setInterval(()=>{state.timer.seconds++;const t=document.getElementById("floorTimer");if(t)t.textContent=fmtTime(state.timer.seconds);else clearInterval(timerHandle);},1000);}
 }
 
-/* ============================================================ 7. CAPACITY PLANNING */
+/* ============================================================ 6. CAPACITY */
 function viewCapacity(){
-  canvas.appendChild(el(`<div class="section-head"><div><div class="eyebrow">Finite scheduling</div><h2 class="h2">Capacity by work center</h2><p class="sub">Committed load vs. available hours per day. Red cells are over capacity — rebalance before they bite.</p></div>
-    <div class="legend"><span class="sw"><i style="background:var(--seq-1)"></i>light</span><span class="sw"><i style="background:var(--seq-3)"></i>busy</span><span class="sw"><i style="background:var(--seq-5)"></i>near full</span><span class="sw"><i style="background:var(--crit)"></i>over</span></div>
-  </div>`));
-
+  canvas.appendChild(el(`<div class="section-head"><div><div class="eyebrow">Finite scheduling</div><h2 class="h2">Capacity by work center</h2><p class="sub">Committed load vs. available hours per day. Red cells are over capacity.</p></div>
+    <div class="legend"><span class="sw"><i style="background:var(--seq-1)"></i>light</span><span class="sw"><i style="background:var(--seq-3)"></i>busy</span><span class="sw"><i style="background:var(--seq-5)"></i>near full</span><span class="sw"><i style="background:var(--crit)"></i>over</span></div></div>`));
   const wrap=el(`<div class="card pad" style="overflow-x:auto"></div>`);
   const t=el(`<table class="heat"><thead><tr><th style="text-align:left">Work center</th>${DAYS.map(d=>`<th>${d}</th>`).join("")}</tr></thead><tbody></tbody></table>`);
   const tb=t.querySelector("tbody");
-  CAPACITY.forEach(row=>{
-    const tr=el(`<tr><td class="wc">${row.wc.name}<small>${row.wc.id} · ${row.cap}h/day</small></td></tr>`);
-    row.load.forEach((h,di)=>{
-      const pct=Math.round(h/row.cap*100);
-      const over=pct>100;
-      const bg=over?"var(--crit)":seqColor(pct);
-      const cell=el(`<td><div class="cell ${over?'over':''}" style="background:${bg}" data-tt="${row.wc.name} · ${DAYS[di]}" data-tt2="${h}h of ${row.cap}h — ${pct}%">${pct}%</div></td>`);
-      tr.appendChild(cell);
-    });
-    tb.appendChild(tr);
-  });
-  wrap.appendChild(t);
-  canvas.appendChild(wrap);
+  CAPACITY.forEach(row=>{const tr=el(`<tr><td class="wc">${row.wc.name}<small>${row.wc.id} · ${row.cap}h/day</small></td></tr>`);
+    row.load.forEach((h,di)=>{const pct=Math.round(h/row.cap*100);const over=pct>100;const bg=over?"var(--crit)":seqColor(pct);
+      tr.appendChild(el(`<td><div class="cell ${over?'over':''}" style="background:${bg}" data-tt="${row.wc.name} · ${DAYS[di]}" data-tt2="${h}h of ${row.cap}h — ${pct}%">${pct}%</div></td>`));});
+    tb.appendChild(tr);});
+  wrap.appendChild(t);canvas.appendChild(wrap);
 
-  // summary row: bottlenecks
-  const overCells=[];
-  CAPACITY.forEach(row=>row.load.forEach((h,di)=>{if(h/row.cap>1)overCells.push({wc:row.wc.name,day:DAYS[di],pct:Math.round(h/row.cap*100)});}));
+  const overCells=[];CAPACITY.forEach(row=>row.load.forEach((h,di)=>{if(h/row.cap>1)overCells.push({wc:row.wc.name,day:DAYS[di],pct:Math.round(h/row.cap*100)});}));
   const s=el(`<div class="grid" style="grid-template-columns:1fr 1fr;gap:16px;margin-top:18px"></div>`);
-  const b1=el(`<div class="card pad"></div>`);
-  b1.appendChild(el(`<div class="eyebrow" style="margin-bottom:10px">Overloaded slots · ${overCells.length}</div>`));
-  if(overCells.length){overCells.slice(0,5).forEach(c=>b1.appendChild(el(`<div class="attn warn" style="margin-bottom:8px"><span class="ai">${I.alert}</span><div><b>${c.wc} — ${c.day}</b><p>Committed to ${c.pct}% of capacity. Pull work earlier or add a shift.</p></div></div>`)));}
+  const b1=el(`<div class="card pad"></div>`);b1.appendChild(el(`<div class="eyebrow" style="margin-bottom:10px">Overloaded slots · ${overCells.length}</div>`));
+  if(overCells.length)overCells.slice(0,5).forEach(c=>b1.appendChild(el(`<div class="attn warn" style="margin-bottom:8px"><span class="ai">${I.alert}</span><div><b>${c.wc} — ${c.day}</b><p>Committed to ${c.pct}% of capacity. Pull earlier or add a shift.</p></div></div>`)));
   else b1.appendChild(el(`<div class="sub">Nothing over capacity this window.</div>`));
   s.appendChild(b1);
+  const b2=el(`<div class="card pad"></div>`);b2.appendChild(el(`<div class="eyebrow" style="margin-bottom:10px">This week's peak per work center</div>`));
+  CAPACITY.forEach(row=>{const peak=Math.max(...row.load);const pct=Math.round(peak/row.cap*100);const over=pct>100;
+    b2.appendChild(el(`<div class="loadbar"><span class="lbl">${row.wc.name}</span><span class="track"><span class="fill" style="width:${Math.min(pct,100)}%;background:${over?'var(--crit)':pct>85?'var(--warn)':'var(--accent)'}"></span><span class="capline"></span></span><span class="pct" style="color:${over?'var(--crit)':'var(--ink-2)'}">${pct}%</span></div>`));});
+  s.appendChild(b2);canvas.appendChild(s);
 
-  const b2=el(`<div class="card pad"></div>`);
-  b2.appendChild(el(`<div class="eyebrow" style="margin-bottom:10px">This week's peak per work center</div>`));
-  CAPACITY.forEach(row=>{
-    const peak=Math.max(...row.load); const pct=Math.round(peak/row.cap*100);
-    const over=pct>100;
-    b2.appendChild(el(`<div class="loadbar"><span class="lbl">${row.wc.name}</span>
-      <span class="track"><span class="fill" style="width:${Math.min(pct,100)}%;background:${over?'var(--crit)':pct>85?'var(--warn)':'var(--accent)'}"></span><span class="capline"></span></span>
-      <span class="pct" style="color:${over?'var(--crit)':'var(--ink-2)'}">${pct}%</span></div>`));
-  });
-  s.appendChild(b2);
-  canvas.appendChild(s);
-
-  // tooltips
   const tip=document.getElementById("tooltip");
-  wrap.querySelectorAll(".cell").forEach(c=>{
-    c.addEventListener("mousemove",e=>{tip.innerHTML=`<div class="tt-t">${c.dataset.tt}</div><div class="tt-s">${c.dataset.tt2}</div>`;
-      tip.style.opacity="1";tip.style.left=(e.clientX+14)+"px";tip.style.top=(e.clientY+14)+"px";});
-    c.addEventListener("mouseleave",()=>tip.style.opacity="0");
-  });
+  wrap.querySelectorAll(".cell").forEach(c=>{c.addEventListener("mousemove",e=>{tip.innerHTML=`<div class="tt-t">${c.dataset.tt}</div><div class="tt-s">${c.dataset.tt2}</div>`;tip.style.opacity="1";tip.style.left=(e.clientX+14)+"px";tip.style.top=(e.clientY+14)+"px";});c.addEventListener("mouseleave",()=>tip.style.opacity="0");});
 }
 
-/* ============================================================ theme toggle */
-document.getElementById("themeBtn").addEventListener("click",()=>{
-  const root=document.documentElement;
-  const cur=root.getAttribute("data-theme")|| (matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");
-  root.setAttribute("data-theme",cur==="dark"?"light":"dark");
-});
-
-/* ============================================================ boot */
+/* ============================================================ theme + boot */
+document.getElementById("themeBtn").addEventListener("click",()=>{const root=document.documentElement;const cur=root.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");root.setAttribute("data-theme",cur==="dark"?"light":"dark");});
 go("command");
 </script>
