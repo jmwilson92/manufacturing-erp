@@ -336,6 +336,8 @@ table.tbl tbody tr.click:hover{background:var(--surface-2)}
     <div class="logo">F</div>
     <button class="nav" data-view="command" aria-label="Command center"><span class="tip">Command center</span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></button>
+    <button class="nav" data-view="demand" aria-label="Demand from Business Central"><span class="tip">Demand · Business Central</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 5-6"/><path d="M18 7h-3M18 7v3"/></svg></button>
     <button class="nav" data-view="create" aria-label="New order"><span class="tip">Create order</span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
     <button class="nav" data-view="routing" aria-label="Routing"><span class="tip">Routing</span>
@@ -460,6 +462,42 @@ const state = {
 };
 function pickset(rows){return rows.map(r=>({part:r[0],name:r[1],need:r[2],avail:r[3],picked:0,bin:randbin()}));}
 function randbin(){const a="ABCDEF"[Math.floor(Math.random()*6)];const b=String(Math.floor(Math.random()*40)+1).padStart(2,"0");const c=String(Math.floor(Math.random()*5)+1);return `${a}-${b}-${c}`;}
+
+/* ============================================================
+   Business Central integration (demand side)
+   BC is the system of record for demand: sales orders + forecast.
+   This app is the system of record for supply/execution.
+   Field names below mirror the BC API v2.0 resources so the
+   mapping to a real feed is 1:1.
+   ------------------------------------------------------------
+   GET /v2.0/{tenant}/{env}/api/v2.0/companies({id})/salesOrders
+        ?$expand=salesOrderLines&$filter=lastModifiedDateTime gt {delta}
+   ============================================================ */
+const BC = {
+  connected:true, environment:"PROD", company:"Laugh Manufacturing Ltd.",
+  lastSync:"2 min ago", tenant:"laugh.onmicrosoft.com",
+};
+// salesOrder + salesOrderLines (BC API v2.0 shape, trimmed to what planning needs)
+const BC_SALESORDERS = [
+  {id:"8b1…a01", number:"S-ORD101044", customerName:"Ridgeline Conveyors", orderDate:"2026-07-18", requestedDeliveryDate:"2026-07-31", status:"Open",
+    salesOrderLines:[{lineType:"Item", lineObjectNumber:"FRM-1200-A", description:"Conveyor Drive Frame — 1200mm", quantity:24, shippedQuantity:0}]},
+  {id:"8b1…a02", number:"S-ORD101051", customerName:"Northgate Automation", orderDate:"2026-07-19", requestedDeliveryDate:"2026-08-05", status:"Open",
+    salesOrderLines:[{lineType:"Item", lineObjectNumber:"PNL-GC-04", description:"Guard Panel Set — Type C", quantity:60, shippedQuantity:12},
+                     {lineType:"Item", lineObjectNumber:"SHF-45-H", description:"Output Shaft 45mm — Hardened", quantity:40, shippedQuantity:0}]},
+  {id:"8b1…a03", number:"S-ORD101052", customerName:"Beltway Systems", orderDate:"2026-07-20", requestedDeliveryDate:"2026-08-12", status:"Open",
+    salesOrderLines:[{lineType:"Item", lineObjectNumber:"FRM-900-A", description:"Conveyor Drive Frame — 900mm", quantity:30, shippedQuantity:0}]},
+  {id:"8b1…a04", number:"S-ORD101060", customerName:"Ridgeline Conveyors", orderDate:"2026-07-21", requestedDeliveryDate:"2026-08-14", status:"Open",
+    salesOrderLines:[{lineType:"Item", lineObjectNumber:"PNL-GA-01", description:"Guard Panel Set — Type A", quantity:48, shippedQuantity:0}]},
+];
+// Demand Forecast (BC Production Forecast Entry — exposed via custom API page)
+const BC_FORECAST = [
+  {itemNumber:"FRM-1200-A", description:"Conveyor Drive Frame — 1200mm", forecastType:"Sales Item", forecastDate:"2026-08-15", quantity:20},
+  {itemNumber:"PNL-GC-04", description:"Guard Panel Set — Type C", forecastType:"Sales Item", forecastDate:"2026-08-15", quantity:40},
+  {itemNumber:"SHF-45-H", description:"Output Shaft 45mm — Hardened", forecastType:"Sales Item", forecastDate:"2026-08-15", quantity:25},
+  {itemNumber:"SHF-60", description:"Output Shaft 60mm", forecastType:"Sales Item", forecastDate:"2026-08-15", quantity:30},
+];
+// on-hand finished goods (would come from BC items/inventory API)
+const ON_HAND = {"FRM-1200-A":0,"FRM-900-A":6,"PNL-GC-04":0,"PNL-GA-01":10,"SHF-45-H":0,"SHF-60":8};
 state.selected = state.orders[0].id;
 
 /* capacity: load per work center per day (hours committed) over 10 days */
@@ -521,6 +559,7 @@ function selOrder(){return state.orders.find(o=>o.id===state.selected);}
 /* ============================================================ router */
 const VIEW_META={
   command:["Command center","Shop-wide status"],
+  demand:["Demand · Business Central","Sales orders & forecast → planned supply"],
   create:["New production order","Draft with live feasibility"],
   routing:["Routing","Operations & work centers"],
   pick:["Pick & issue","Stage components to the floor"],
@@ -544,7 +583,7 @@ document.querySelectorAll(".rail .nav[data-view]").forEach(b=>b.addEventListener
 const canvas=document.getElementById("canvas");
 function render(){
   canvas.innerHTML="";
-  ({command:viewCommand,create:viewCreate,routing:viewRouting,pick:viewPick,
+  ({command:viewCommand,demand:viewDemand,create:viewCreate,routing:viewRouting,pick:viewPick,
     release:viewRelease,floor:viewFloor,capacity:viewCapacity}[state.view])();
 }
 
@@ -572,9 +611,10 @@ function stepper(o){
 function orderHeader(o,actionHtml){
   return `<div class="card pad" style="margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
     <div>
-      <div class="row" style="gap:9px">
+      <div class="row" style="gap:9px;flex-wrap:wrap">
         <span class="tag">${o.id}</span>${priPill(o.priority)}
         <span class="pill accent">${o.part}</span>
+        ${o.source?`<span class="pill info" title="Originated from Business Central demand"><span class="dot"></span>${o.source}</span>`:""}
       </div>
       <div style="font-size:18px;font-weight:700;letter-spacing:-.02em;margin-top:7px">${o.product}</div>
     </div>
@@ -620,9 +660,13 @@ function viewCommand(){
   </div>`));
 
   // attention strip
-  const attn=el(`<div class="grid" style="grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px"></div>`);
+  const unplanned=planRequirements().filter(r=>r.net>0).length;
+  const attn=el(`<div class="grid" style="grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px"></div>`);
   attn.appendChild(el(`<div class="attn crit"><span class="ai">${I.alert}</span><div><b>PO-4822 · Output Shaft 45mm is hot &amp; due Jul 23</b><p>Routed but not picked — 0% staged. Start picking to hold the date.</p></div></div>`));
   attn.appendChild(el(`<div class="attn warn"><span class="ai">${I.alert}</span><div><b>PO-4819 · Guard Panel Set short on RAL9005 powder</b><p>Need 3, only 1 on hand. Backorder 2 or substitute finish before release.</p></div></div>`));
+  const demandAttn=el(`<div class="attn" style="background:var(--accent-soft);border-color:var(--accent-line);cursor:pointer"><span class="ai" style="color:var(--accent)">${I.box}</span><div><b>${unplanned} item(s) with unplanned demand from Business Central</b><p style="color:var(--ink-2)">New sales orders &amp; forecast exceed supply. Open the planner to convert them to production orders.</p></div></div>`);
+  demandAttn.addEventListener("click",()=>go("demand"));
+  attn.appendChild(demandAttn);
   canvas.appendChild(attn);
 
   // board + capacity
@@ -695,6 +739,120 @@ function spark(vals){
     <path d="${d}" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
     <circle cx="${pts[pts.length-1][0].toFixed(1)}" cy="${pts[pts.length-1][1].toFixed(1)}" r="2.4" fill="var(--accent)"/>
   </svg>`;
+}
+
+/* ============================================================ 1b. DEMAND (Business Central) + planning bridge */
+function itemName(part){
+  const c=CATALOG.find(x=>x.part===part); if(c)return c.name;
+  const s=BC_SALESORDERS.flatMap(o=>o.salesOrderLines).find(l=>l.lineObjectNumber===part);
+  return s?s.description:part;
+}
+function familyOf(part){const c=CATALOG.find(x=>x.part===part);return c?c.family:"frame";}
+// aggregate BC demand + existing supply into net requirements
+function planRequirements(){
+  const items={};
+  const add=(part,desc,qty,src)=>{const k=part;items[k]=items[k]||{part,desc,so:0,fc:0,onHand:ON_HAND[part]||0,onOrder:0};
+    if(src==="so")items[k].so+=qty; else items[k].fc+=qty;};
+  BC_SALESORDERS.forEach(o=>o.salesOrderLines.forEach(l=>{
+    const open=l.quantity-l.shippedQuantity; if(open>0)add(l.lineObjectNumber,l.description,open,"so");}));
+  BC_FORECAST.forEach(f=>add(f.itemNumber,f.description,f.quantity,"fc"));
+  // supply already scheduled here (open production orders)
+  state.orders.filter(o=>o.stage!=="complete").forEach(o=>{if(items[o.part])items[o.part].onOrder+=o.qty;});
+  return Object.values(items).map(it=>{
+    const gross=it.so+it.fc; const net=Math.max(0, gross-it.onHand-it.onOrder);
+    return {...it, gross, net, covered:net===0};
+  }).sort((a,b)=>b.net-a.net);
+}
+function viewDemand(){
+  // sync status strip
+  canvas.appendChild(el(`<div class="card pad" style="margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;border-left:3px solid var(--good)">
+    <div class="row" style="gap:10px">
+      <span style="width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:var(--good-soft);color:var(--good)">${I.checkc}</span>
+      <div><b style="font-size:14px">Connected to Business Central</b>
+        <div class="sub" style="font-size:12px">${BC.company} · env <span class="tag" style="padding:1px 6px">${BC.environment}</span> · ${BC.tenant}</div></div>
+    </div>
+    <div class="grow" style="flex:1"></div>
+    <div style="text-align:right"><div class="eyebrow">Sales orders</div><div class="num" style="font-weight:700">${BC_SALESORDERS.length}</div></div>
+    <div style="text-align:right"><div class="eyebrow">Forecast lines</div><div class="num" style="font-weight:700">${BC_FORECAST.length}</div></div>
+    <div style="text-align:right"><div class="eyebrow">Last sync</div><div class="num" style="font-weight:700">${BC.lastSync}</div></div>
+    <button class="btn sm" id="syncBtn">${I.route}Sync now</button>
+  </div>`));
+
+  canvas.appendChild(el(`<div class="attn" style="margin-bottom:16px;background:var(--accent-soft);border-color:var(--accent-line)">
+    <span class="ai" style="color:var(--accent)">${I.arrow}</span>
+    <div><b>Demand drives supply.</b><p style="color:var(--ink-2)">Sales orders and forecasts stay owned in Business Central. This planner nets them against on-hand stock and open production orders, then suggests exactly what to build — one click turns a shortfall into a routed production order.</p></div></div>`));
+
+  // ---- PLANNING BRIDGE: net requirements ----
+  const reqs=planRequirements();
+  const planCard=el(`<div class="card" style="margin-bottom:18px"></div>`);
+  planCard.appendChild(el(`<div class="pad" style="border-bottom:1px solid var(--border);display:flex;align-items:flex-end;justify-content:space-between">
+    <div><div class="eyebrow">Planning worksheet</div><h3 class="h2">Net requirements → suggested production</h3></div>
+    <span class="sub">${reqs.filter(r=>r.net>0).length} item(s) need action</span></div>`));
+  const ptbl=el(`<table class="tbl"><thead><tr>
+    <th>Item</th><th class="right">Sales orders</th><th class="right">Forecast</th><th class="right">On hand</th><th class="right">On order</th><th class="right">Net req.</th><th>Coverage</th><th></th>
+  </tr></thead><tbody></tbody></table>`);
+  const ptb=ptbl.querySelector("tbody");
+  reqs.forEach(r=>{
+    const tr=el(`<tr>
+      <td><b style="font-weight:650">${r.desc}</b><br><span class="tag">${r.part}</span></td>
+      <td class="right num">${r.so||"—"}</td>
+      <td class="right num" style="color:var(--ink-3)">${r.fc||"—"}</td>
+      <td class="right num">${r.onHand||"—"}</td>
+      <td class="right num">${r.onOrder||"—"}</td>
+      <td class="right num" style="font-weight:700;color:${r.net>0?'var(--warn)':'var(--ink)'}">${r.net||0}</td>
+      <td>${r.covered?'<span class="pill good"><span class="dot"></span>Covered</span>':'<span class="pill warn"><span class="dot"></span>Short '+r.net+'</span>'}</td>
+      <td class="right">${r.net>0?`<button class="btn primary sm" data-plan="${r.part}" data-qty="${r.net}">Plan PO</button>`:'<span class="muted" style="font-size:12px">—</span>'}</td>
+    </tr>`);
+    ptb.appendChild(tr);
+  });
+  planCard.appendChild(el(`<div style="overflow-x:auto"></div>`)).appendChild(ptbl);
+  canvas.appendChild(planCard);
+
+  // ---- raw BC feeds (provenance) ----
+  const split=el(`<div class="grid" style="grid-template-columns:1fr 1fr;gap:16px"></div>`);
+  // sales orders feed
+  const soCard=el(`<div class="card"></div>`);
+  soCard.appendChild(el(`<div class="pad" style="border-bottom:1px solid var(--border)"><div class="eyebrow">salesOrders + salesOrderLines</div><span class="sub">Live feed · BC API v2.0</span></div>`));
+  const soT=el(`<table class="tbl"><thead><tr><th>Order</th><th>Customer</th><th>Item / qty</th><th class="right">Deliver by</th></tr></thead><tbody></tbody></table>`);
+  BC_SALESORDERS.forEach(o=>{
+    const lines=o.salesOrderLines.map(l=>`${l.lineObjectNumber} ×${l.quantity}${l.shippedQuantity?` <span class="muted">(${l.shippedQuantity} shipped)</span>`:""}`).join("<br>");
+    soT.querySelector("tbody").appendChild(el(`<tr>
+      <td><span class="mono" style="font-weight:600">${o.number}</span><br><span class="pill neutral" style="font-size:10px">${o.status}</span></td>
+      <td style="font-size:12.5px">${o.customerName}</td>
+      <td style="font-size:12px" class="mono">${lines}</td>
+      <td class="right num" style="font-size:12px">${o.requestedDeliveryDate.slice(5)}</td></tr>`));
+  });
+  soCard.appendChild(el(`<div style="overflow-x:auto"></div>`)).appendChild(soT);
+  split.appendChild(soCard);
+  // forecast feed
+  const fcCard=el(`<div class="card"></div>`);
+  fcCard.appendChild(el(`<div class="pad" style="border-bottom:1px solid var(--border)"><div class="eyebrow">Demand forecast</div><span class="sub">Production Forecast Entry · custom API page</span></div>`));
+  const fcT=el(`<table class="tbl"><thead><tr><th>Item</th><th>Type</th><th class="right">Qty</th><th class="right">Forecast date</th></tr></thead><tbody></tbody></table>`);
+  BC_FORECAST.forEach(f=>{
+    fcT.querySelector("tbody").appendChild(el(`<tr>
+      <td><b style="font-weight:600;font-size:12.5px">${f.description}</b><br><span class="tag">${f.itemNumber}</span></td>
+      <td><span class="pill info" style="font-size:10px">${f.forecastType}</span></td>
+      <td class="right num">${f.quantity}</td>
+      <td class="right num" style="font-size:12px">${f.forecastDate.slice(5)}</td></tr>`));
+  });
+  fcCard.appendChild(el(`<div style="overflow-x:auto"></div>`)).appendChild(fcT);
+  split.appendChild(fcCard);
+  canvas.appendChild(split);
+
+  // wire
+  ptb.querySelectorAll("[data-plan]").forEach(b=>b.addEventListener("click",()=>{
+    planPO(b.dataset.plan, +b.dataset.qty);
+  }));
+  document.getElementById("syncBtn").addEventListener("click",()=>{BC.lastSync="just now";toast("Synced from Business Central — demand up to date");render();});
+}
+function planPO(part, qty){
+  const fam=familyOf(part);
+  const o=mkOrder({product:itemName(part), part, qty, family:fam, stage:"routed", priority:"normal",
+    due:"Aug 15", source:"Business Central demand",
+    picks:pickset(genPicks(fam, qty))});
+  state.orders.unshift(o); state.selected=o.id;
+  toast(`${o.id} planned from demand — ${qty} × ${part}`);
+  go("routing");
 }
 
 /* ============================================================ 2. CREATE ORDER (live feasibility) */
